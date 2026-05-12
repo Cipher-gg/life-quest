@@ -1,0 +1,15 @@
+.git
+.gitignore
+.github
+.env
+.env.*
+README.md
+docker-compose.yml
+.dockerignore
+Dockerfile
+*.md
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+life-quest-*.json

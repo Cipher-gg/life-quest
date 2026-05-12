@@ -1,0 +1,1102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Life Quest — Daily Hub</title>
+<style>
+  :root {
+    --bg: #0b0f17;
+    --bg-2: #11172380;
+    --panel: #131a28;
+    --panel-2: #1a2334;
+    --border: #243049;
+    --text: #e6edf7;
+    --muted: #8aa0c0;
+    --dim: #5b6b85;
+    --fit: #ff4d6d;        /* red */
+    --fit-glow: #ff4d6d55;
+    --content: #b14bff;    /* purple */
+    --content-glow: #b14bff55;
+    --cyber: #2bd4ff;      /* cyan */
+    --cyber-glow: #2bd4ff55;
+    --life: #ffd24a;       /* gold */
+    --good: #4cd97b;
+    --warn: #ffb454;
+    --bad: #ff5468;
+    --accent: #6cf;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', Inter, system-ui, sans-serif; }
+  body {
+    background:
+      radial-gradient(1200px 700px at 10% -10%, #1a2c4f33, transparent 60%),
+      radial-gradient(900px 600px at 110% 0%, #4b1a6633, transparent 60%),
+      radial-gradient(900px 700px at 50% 120%, #0f3a4233, transparent 60%),
+      var(--bg);
+    min-height: 100vh;
+  }
+  a { color: var(--accent); }
+  .mono { font-family: 'JetBrains Mono', 'Cascadia Mono', 'Consolas', monospace; }
+
+  /* Layout */
+  .wrap { max-width: 1400px; margin: 0 auto; padding: 24px; }
+  .grid { display: grid; gap: 16px; }
+  .grid.cols-3 { grid-template-columns: 1.1fr 1fr 1fr; }
+  .grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 1100px) { .grid.cols-3 { grid-template-columns: 1fr; } .grid.cols-2 { grid-template-columns: 1fr; } }
+
+  /* Header */
+  header.hud {
+    display: flex; align-items: center; gap: 16px;
+    background: linear-gradient(180deg, #14202f, #0e1624);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 0 0 1px #0006, 0 12px 30px #0006;
+  }
+  .avatar {
+    width: 56px; height: 56px; border-radius: 12px;
+    background: conic-gradient(from 220deg, var(--fit), var(--content), var(--cyber), var(--fit));
+    display: grid; place-items: center; color: #0b0f17; font-weight: 900; font-size: 26px;
+    box-shadow: 0 0 18px #2bd4ff44 inset, 0 0 18px #b14bff44;
+  }
+  .hud .name { font-size: 20px; font-weight: 700; letter-spacing: 0.5px; }
+  .hud .sub { color: var(--muted); font-size: 13px; }
+  .hud-right { margin-left: auto; display: flex; align-items: center; gap: 18px; }
+  .lvl-pill {
+    background: #0e1624; border: 1px solid var(--border); padding: 8px 12px;
+    border-radius: 10px; min-width: 140px; text-align: center;
+  }
+  .lvl-pill .big { font-size: 22px; font-weight: 800; color: var(--life); }
+  .lvl-pill .lbl { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+
+  /* Class bars */
+  .classes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+  .class-card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px; position: relative; overflow: hidden;
+  }
+  .class-card::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(400px 80px at 50% -10%, var(--c-glow), transparent 70%);
+  }
+  .class-card.fit { --c: var(--fit); --c-glow: var(--fit-glow); }
+  .class-card.content { --c: var(--content); --c-glow: var(--content-glow); }
+  .class-card.cyber { --c: var(--cyber); --c-glow: var(--cyber-glow); }
+  .class-card .top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; }
+  .class-card .icon { font-size: 18px; }
+  .class-card h3 { margin: 0; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; color: var(--c); }
+  .class-card .lvl { font-size: 28px; font-weight: 800; color: var(--text); }
+  .class-card .xp { font-size: 12px; color: var(--muted); }
+  .bar {
+    background: #0a121d; height: 10px; border-radius: 100px; overflow: hidden;
+    border: 1px solid #0006; box-shadow: inset 0 1px 0 #fff0a;
+  }
+  .bar > div {
+    height: 100%; background: linear-gradient(90deg, var(--c), #fff8);
+    box-shadow: 0 0 12px var(--c-glow); transition: width .4s ease;
+  }
+  .class-card .meta { display: flex; gap: 12px; margin-top: 8px; font-size: 12px; color: var(--muted); }
+  .streak { color: var(--warn); font-weight: 700; }
+  .streak .flame { filter: drop-shadow(0 0 4px #ff8a3855); }
+
+  /* Panels */
+  .panel {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+    padding: 18px; box-shadow: 0 10px 28px #0005;
+  }
+  .panel h2 {
+    margin: 0 0 12px; font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--muted); display: flex; align-items: center; gap: 8px;
+  }
+  .panel h2::before {
+    content: ''; width: 8px; height: 8px; background: var(--accent); border-radius: 50%;
+    box-shadow: 0 0 10px var(--accent);
+  }
+  .panel-sub { color: var(--dim); font-size: 12px; margin-top: -6px; margin-bottom: 12px; }
+
+  /* Quests */
+  .quest-group { margin-bottom: 14px; }
+  .quest-group h4 {
+    margin: 0 0 8px; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--c, var(--muted)); display: flex; align-items: center; gap: 8px;
+  }
+  .quest-group.fit { --c: var(--fit); }
+  .quest-group.content { --c: var(--content); }
+  .quest-group.cyber { --c: var(--cyber); }
+  .quest-group.life { --c: var(--life); }
+  .quest {
+    display: flex; align-items: center; gap: 10px;
+    background: #0e1624; border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 12px; margin-bottom: 6px; cursor: pointer; transition: all .15s ease;
+    user-select: none;
+  }
+  .quest:hover { border-color: var(--c, var(--accent)); transform: translateX(2px); }
+  .quest.done { opacity: .55; }
+  .quest.done .q-label { text-decoration: line-through; }
+  .q-check {
+    width: 22px; height: 22px; border-radius: 6px;
+    border: 2px solid var(--c, var(--muted)); display: grid; place-items: center;
+    flex-shrink: 0; transition: all .15s ease;
+  }
+  .quest.done .q-check {
+    background: var(--c, var(--accent));
+    box-shadow: 0 0 10px var(--c, var(--accent));
+  }
+  .q-check svg { width: 14px; height: 14px; opacity: 0; transition: opacity .15s ease; }
+  .quest.done .q-check svg { opacity: 1; }
+  .q-label { flex: 1; font-size: 14px; }
+  .q-xp { font-size: 11px; color: var(--muted); font-weight: 700; letter-spacing: 0.5px; }
+
+  /* Bosses */
+  .boss {
+    background: linear-gradient(180deg, #1a1226, #0e1624);
+    border: 1px solid #4a2e6a; border-radius: 12px; padding: 14px; margin-bottom: 10px;
+    position: relative; overflow: hidden;
+  }
+  .boss.final { border-color: var(--bad); background: linear-gradient(180deg, #2a0e16, #14060a); }
+  .boss.final::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(300px 80px at 50% -20%, #ff446655, transparent 70%);
+  }
+  .boss .row { display: flex; justify-content: space-between; align-items: baseline; }
+  .boss .name { font-weight: 800; font-size: 15px; }
+  .boss .tag { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+  .boss .hp { background: #0a121d; height: 12px; border-radius: 100px; margin: 8px 0 6px; overflow: hidden; border: 1px solid #0008; }
+  .boss .hp > div { height: 100%; background: linear-gradient(90deg, var(--bad), #ffb454); box-shadow: 0 0 10px #ff446666; transition: width .4s ease; }
+  .boss.mini .hp > div { background: linear-gradient(90deg, var(--content), var(--cyber)); box-shadow: 0 0 10px var(--content-glow); }
+  .boss .meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+  .countdown { color: var(--warn); font-weight: 800; }
+
+  /* Achievements */
+  .ach-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .ach {
+    background: #0e1624; border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px; display: flex; gap: 10px; align-items: center;
+    opacity: .4; transition: all .2s ease;
+  }
+  .ach.unlocked { opacity: 1; border-color: var(--life); box-shadow: 0 0 12px #ffd24a22 inset; }
+  .ach .ico { font-size: 22px; }
+  .ach .t { font-size: 12px; font-weight: 700; }
+  .ach .d { font-size: 11px; color: var(--muted); }
+
+  /* Buttons */
+  button, .btn {
+    background: #1d2638; color: var(--text); border: 1px solid var(--border);
+    padding: 8px 14px; border-radius: 10px; cursor: pointer; font-size: 13px;
+    font-weight: 600; letter-spacing: 0.3px; transition: all .15s ease;
+  }
+  button:hover, .btn:hover { border-color: var(--accent); background: #243049; }
+  button.primary { background: linear-gradient(180deg, #2bd4ff22, #2bd4ff11); border-color: var(--cyber); color: var(--cyber); }
+  button.primary:hover { background: var(--cyber); color: #0b0f17; }
+  button.danger { border-color: var(--bad); color: var(--bad); }
+  button.danger:hover { background: var(--bad); color: #0b0f17; }
+  button.ghost { background: transparent; border: 1px dashed var(--border); color: var(--muted); }
+
+  /* Form inputs */
+  input[type=text], input[type=number], input[type=date], textarea {
+    background: #0a121d; border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); padding: 8px 10px; font-size: 13px; font-family: inherit; width: 100%;
+  }
+  input:focus, textarea:focus { outline: none; border-color: var(--accent); }
+  label { font-size: 12px; color: var(--muted); display: block; margin: 8px 0 4px; }
+
+  /* Settings */
+  .settings-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* Toast / level-up */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px; z-index: 200;
+    background: linear-gradient(180deg, #1d2638, #0e1624);
+    border: 1px solid var(--life); border-radius: 12px; padding: 14px 18px;
+    box-shadow: 0 0 30px #ffd24a55; opacity: 0; transform: translateY(20px);
+    transition: all .3s ease; pointer-events: none; min-width: 240px;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast .t { font-weight: 800; color: var(--life); letter-spacing: 1px; text-transform: uppercase; font-size: 12px; }
+  .toast .m { font-size: 14px; margin-top: 4px; }
+
+  /* Notes */
+  textarea.notes { min-height: 90px; resize: vertical; }
+
+  /* Streak heatmap */
+  .heatmap { display: grid; grid-template-columns: repeat(14, 1fr); gap: 3px; margin-top: 8px; }
+  .heatmap .cell { aspect-ratio: 1; border-radius: 3px; background: #0e1624; border: 1px solid #1a2334; }
+  .heatmap .cell.l1 { background: #243049; }
+  .heatmap .cell.l2 { background: #2b4a7a; }
+  .heatmap .cell.l3 { background: #2bd4ffaa; }
+  .heatmap .cell.l4 { background: #2bd4ff; box-shadow: 0 0 4px var(--cyber-glow); }
+  .heatmap .cell.today { outline: 1px solid var(--life); }
+
+  /* Weigh-in */
+  .weigh-in {
+    background: linear-gradient(180deg, #1a0e14, #0e1624);
+    border: 1px solid var(--fit);
+    border-radius: 10px;
+    padding: 10px 12px; margin-bottom: 10px;
+    box-shadow: 0 0 12px var(--fit-glow) inset;
+  }
+  .weigh-in .wi-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .weigh-in label { font-size: 10px; letter-spacing: 1.5px; color: var(--muted); margin: 0 0 4px; text-transform: uppercase; }
+  .weigh-in input { padding: 6px 8px; font-size: 14px; }
+  .weigh-in .wi-stats {
+    font-size: 11px; color: var(--muted); margin-top: 8px;
+    display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+    font-family: 'JetBrains Mono', 'Cascadia Mono', 'Consolas', monospace;
+  }
+  .weigh-in .delta.up { color: var(--bad); }
+  .weigh-in .delta.down { color: var(--good); }
+
+  /* Misc */
+  .row-flex { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .sep { height: 1px; background: var(--border); margin: 14px 0; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 100px; font-size: 11px; background: #0e1624; border: 1px solid var(--border); color: var(--muted); }
+  .pill.fit { color: var(--fit); border-color: var(--fit); }
+  .pill.content { color: var(--content); border-color: var(--content); }
+  .pill.cyber { color: var(--cyber); border-color: var(--cyber); }
+  .footer { color: var(--dim); font-size: 11px; text-align: center; padding: 24px 0 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hud">
+    <div class="avatar" id="avatar">MS</div>
+    <div>
+      <div class="name"><input id="playerName" type="text" value="Mason" style="background:transparent;border:none;color:var(--text);font-size:20px;font-weight:700;padding:0;width:180px;" /></div>
+      <div class="sub mono" id="todayLabel">—</div>
+    </div>
+    <div class="hud-right">
+      <div class="lvl-pill">
+        <div class="big" id="totalLevel">1</div>
+        <div class="lbl">Hero Level</div>
+      </div>
+      <div class="lvl-pill">
+        <div class="big" id="dayStreak">0</div>
+        <div class="lbl">Day Streak</div>
+      </div>
+      <div class="lvl-pill">
+        <div class="big" id="totalXP">0</div>
+        <div class="lbl">Total XP</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="classes">
+    <div class="class-card fit">
+      <div class="top">
+        <h3><span class="icon">🏋️</span> Fitness</h3>
+        <div class="lvl"><span id="lvlFit">1</span></div>
+      </div>
+      <div class="bar"><div id="barFit" style="width:0%"></div></div>
+      <div class="meta">
+        <span class="xp" id="xpFit">0 / 100 XP</span>
+        <span class="streak"><span class="flame">🔥</span> <span id="streakFit">0</span>d streak</span>
+        <span class="xp" id="multFit">x1.0</span>
+      </div>
+    </div>
+    <div class="class-card content">
+      <div class="top">
+        <h3><span class="icon">🎬</span> Content</h3>
+        <div class="lvl"><span id="lvlContent">1</span></div>
+      </div>
+      <div class="bar"><div id="barContent" style="width:0%"></div></div>
+      <div class="meta">
+        <span class="xp" id="xpContent">0 / 100 XP</span>
+        <span class="streak"><span class="flame">🔥</span> <span id="streakContent">0</span>d streak</span>
+        <span class="xp" id="multContent">x1.0</span>
+      </div>
+    </div>
+    <div class="class-card cyber">
+      <div class="top">
+        <h3><span class="icon">🛡️</span> Cyber</h3>
+        <div class="lvl"><span id="lvlCyber">1</span></div>
+      </div>
+      <div class="bar"><div id="barCyber" style="width:0%"></div></div>
+      <div class="meta">
+        <span class="xp" id="xpCyber">0 / 100 XP</span>
+        <span class="streak"><span class="flame">🔥</span> <span id="streakCyber">0</span>d streak</span>
+        <span class="xp" id="multCyber">x1.0</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid cols-3">
+
+    <!-- Daily Quests -->
+    <div class="panel">
+      <h2>Daily Quests</h2>
+      <div class="panel-sub">Resets every day at midnight. Combo not broken if you complete <strong>at least one quest in a category</strong>.</div>
+
+      <div class="quest-group fit">
+        <h4>🏋️ Fitness</h4>
+        <div class="weigh-in">
+          <div class="wi-row">
+            <div>
+              <label>🌅 Morning weight</label>
+              <input id="wAM" type="number" step="0.1" min="0" placeholder="lbs" />
+            </div>
+            <div>
+              <label>🌙 Before bed</label>
+              <input id="wPM" type="number" step="0.1" min="0" placeholder="lbs" />
+            </div>
+          </div>
+          <div class="wi-stats" id="weighStats">—</div>
+        </div>
+        <div id="qFit"></div>
+      </div>
+
+      <div class="quest-group content">
+        <h4>🎬 Content</h4>
+        <div id="qContent"></div>
+      </div>
+
+      <div class="quest-group cyber">
+        <h4>🛡️ Cybersecurity / Sec+</h4>
+        <div id="qCyber"></div>
+      </div>
+
+      <div class="quest-group life">
+        <h4>⚡ Life / Buffs</h4>
+        <div id="qLife"></div>
+      </div>
+
+      <div class="sep"></div>
+      <div class="row-flex">
+        <button class="primary" onclick="endDay()">⏎ End Day & Lock Streaks</button>
+        <button class="ghost" onclick="resetToday()">Reset today's checks</button>
+      </div>
+      <div class="panel-sub" style="margin-top:10px">Tip: Hit End Day before sleep — locks the streak and rolls the date forward.</div>
+    </div>
+
+    <!-- Bosses + Streaks -->
+    <div class="panel">
+      <h2>Boss Fights</h2>
+      <div class="panel-sub">Big milestones. Update HP as you make progress.</div>
+
+      <div id="bosses"></div>
+
+      <div class="sep"></div>
+      <h2>Last 14 Days</h2>
+      <div class="panel-sub">Each cell = quests completed that day. Brighter = better.</div>
+      <div class="heatmap" id="heatmap"></div>
+
+      <div class="sep"></div>
+      <h2>Today's Notes</h2>
+      <textarea class="notes" id="notes" placeholder="Wins, ideas, what to film tomorrow, what to study next..."></textarea>
+    </div>
+
+    <!-- Achievements + Settings -->
+    <div class="panel">
+      <h2>Achievements</h2>
+      <div class="panel-sub"><span id="achCount">0</span> / <span id="achTotal">0</span> unlocked</div>
+      <div class="ach-grid" id="achievements"></div>
+
+      <div class="sep"></div>
+      <h2>Settings & Bosses</h2>
+      <label>Security+ exam date</label>
+      <input id="cfgSecPlusDate" type="date" />
+
+      <div class="settings-row">
+        <div>
+          <label>🎵 TikTok — current</label>
+          <input id="cfgTiktokNow" type="number" min="0" />
+        </div>
+        <div>
+          <label>🎵 TikTok — goal</label>
+          <input id="cfgTiktokGoal" type="number" min="1" />
+        </div>
+      </div>
+
+      <div class="settings-row">
+        <div>
+          <label>📷 Instagram — current</label>
+          <input id="cfgInstagramNow" type="number" min="0" />
+        </div>
+        <div>
+          <label>📷 Instagram — goal</label>
+          <input id="cfgInstagramGoal" type="number" min="1" />
+        </div>
+      </div>
+
+      <div class="settings-row">
+        <div>
+          <label>▶️ YouTube subs — current</label>
+          <input id="cfgYoutubeNow" type="number" min="0" />
+        </div>
+        <div>
+          <label>▶️ YouTube subs — goal</label>
+          <input id="cfgYoutubeGoal" type="number" min="1" />
+        </div>
+      </div>
+
+      <div class="settings-row">
+        <div>
+          <label>Posts shipped (lifetime)</label>
+          <input id="cfgPostsNow" type="number" min="0" />
+        </div>
+        <div>
+          <label>Post-100 boss target</label>
+          <input id="cfgPostsGoal" type="number" min="1" />
+        </div>
+      </div>
+
+      <div class="row-flex" style="margin-top:12px">
+        <button onclick="saveSettings()" class="primary">Save settings</button>
+        <button onclick="exportData()">Export JSON</button>
+        <button onclick="importData()" class="ghost">Import</button>
+        <button onclick="hardReset()" class="danger">Hard reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer mono">Life Quest v1 — runs locally, saves to your browser. Built for the cert grind, the gym, and the content trenches.</div>
+</div>
+
+<div class="toast" id="toast"><div class="t" id="toastTitle">+XP</div><div class="m" id="toastMsg">Nice work.</div></div>
+
+<script>
+/* ============================================================
+   Life Quest — single-file local app
+   State stored in localStorage under key "lifeQuest_v1"
+   ============================================================ */
+
+const STATE_KEY = 'lifeQuest_v1';
+
+const QUESTS = {
+  fit: [
+    { id:'lift',   label:'Lift session (or main training block)',     xp:50 },
+    { id:'walk',   label:'1 hour walk',                                xp:30 },
+    { id:'prot',   label:'Hit protein target (~1g per lb bodyweight)',xp:20 },
+    { id:'steps',  label:'10,000+ steps',                              xp:20 },
+  ],
+  content: [
+    { id:'film',   label:'Film 1+ short-form clip',                    xp:25 },
+    { id:'post',   label:'Edit + post 1 short (TikTok / Reels / Shorts)', xp:50 },
+    { id:'ideas',  label:'Capture 3 content ideas (Notes app / doc)',  xp:15 },
+    { id:'engage', label:'15 min engaging with creators in your niche',xp:10 },
+  ],
+  cyber: [
+    { id:'study',  label:'60+ min Sec+ study (Messer / Dion / book)',  xp:50 },
+    { id:'prac',   label:'10+ practice questions (or 1 domain quiz)',  xp:25 },
+    { id:'review', label:'Review flashcards / notes (15 min)',          xp:15 },
+    { id:'lab',    label:'Hands-on (TryHackMe / lab / tool demo)',      xp:30 },
+  ],
+  life: [
+    { id:'sleep',  label:'Slept 7+ hours last night',                   xp:15 },
+    { id:'morn',   label:'No phone first 30 min of the day',            xp:10 },
+    { id:'water',  label:'Drank 100+ oz water',                          xp:10 },
+    { id:'plan',   label:'Planned tomorrow before bed (3 priorities)',  xp:15 },
+  ],
+};
+
+const ACHIEVEMENTS = [
+  { id:'firstblood', ico:'🩸', title:'First Blood',          desc:'Complete your first day.' },
+  { id:'iron7',      ico:'⛓️',  title:'Iron Habit',            desc:'7-day streak in any class.' },
+  { id:'forged30',   ico:'🔥', title:'Forged',                desc:'30-day streak in any class.' },
+  { id:'gym20',      ico:'💪', title:'Gym Rat',                desc:'Log 20 lift sessions.' },
+  { id:'shipper',    ico:'📦', title:'Shipper',                desc:'Post 7 days in a row.' },
+  { id:'pen50',      ico:'📚', title:'Knowledge is Power',     desc:'25 hours of Sec+ study logged.' },
+  { id:'labrat',     ico:'🧪', title:'Lab Rat',                desc:'Complete 10 hands-on labs.' },
+  { id:'triathlete', ico:'🎯', title:'Triathlete',             desc:'5 days running where all 3 classes hit.' },
+  { id:'diamond100', ico:'💎', title:'Diamond Hands',          desc:'100-day hero streak.' },
+  { id:'bossdrop',   ico:'⚔️',  title:'Boss Slayer',            desc:'Defeat your first boss.' },
+  { id:'creator1k',  ico:'📈', title:'1K Club',                desc:'Hit follower goal on any platform.' },
+  { id:'secplus',    ico:'🛡️',  title:'Certified',              desc:'Pass Security+.' },
+  { id:'tiktokstar', ico:'🎵', title:'TikTok Pull',            desc:'Hit your TikTok follower goal.' },
+  { id:'instastar',  ico:'📷', title:'Insta Reach',            desc:'Hit your Instagram follower goal.' },
+  { id:'youtube1k',  ico:'▶️',  title:'YouTube Era',            desc:'Hit your YouTube subs goal.' },
+  { id:'tripleplat', ico:'👑', title:'Triple Threat',          desc:'Hit goals on TikTok, IG, AND YouTube.' },
+  { id:'allnight',   ico:'🌙', title:'Renaissance Day',        desc:'Complete every single quest in one day.' },
+];
+
+/* ----------------- State management ----------------- */
+
+function todayStr(d=new Date()) {
+  const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function daysBetween(a, b) {
+  const da = new Date(a + 'T00:00:00'), db = new Date(b + 'T00:00:00');
+  return Math.round((db - da) / 86400000);
+}
+
+function defaultState() {
+  const today = todayStr();
+  const oneMonth = new Date(); oneMonth.setDate(oneMonth.getDate() + 30);
+  return {
+    version: 1,
+    name: 'Mason',
+    today,
+    xp: { fit: 0, content: 0, cyber: 0 },
+    levels: { fit: 1, content: 1, cyber: 1 },
+    streaks: { fit: 0, content: 0, cyber: 0, hero: 0 },
+    lifetime: { lifts: 0, posts: 0, studyHours: 0, labs: 0, fullDays: 0, allCategoryDays: 0 },
+    completions: {}, // { 'YYYY-MM-DD': { fit:[ids], content:[ids], cyber:[ids], life:[ids] } }
+    weights: {},     // { 'YYYY-MM-DD': { am: number, pm: number } }
+    notes: {},       // { 'YYYY-MM-DD': 'text' }
+    achievements: {},
+    settings: {
+      secPlusDate: todayStr(oneMonth),
+      tiktokNow: 0, tiktokGoal: 1000,
+      instagramNow: 0, instagramGoal: 1000,
+      youtubeNow: 0, youtubeGoal: 1000,
+      postsNow: 0, postsGoal: 100,
+    },
+    bossDefeated: { secPlus: false, tiktok: false, instagram: false, youtube: false, posts: false },
+  };
+}
+
+let state = load();
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STATE_KEY);
+    if (!raw) return defaultState();
+    const s = JSON.parse(raw);
+    // Migrate any missing keys
+    const def = defaultState();
+    return { ...def, ...s, xp: {...def.xp, ...s.xp}, levels:{...def.levels, ...s.levels},
+      streaks:{...def.streaks, ...s.streaks}, lifetime:{...def.lifetime, ...s.lifetime},
+      settings:{...def.settings, ...s.settings}, bossDefeated:{...def.bossDefeated, ...s.bossDefeated},
+      completions: s.completions || {}, weights: s.weights || {}, notes: s.notes || {}, achievements: s.achievements || {} };
+  } catch(e) {
+    console.warn('Load failed, resetting', e);
+    return defaultState();
+  }
+}
+
+let _saveWarned = false;
+function save() {
+  try {
+    localStorage.setItem(STATE_KEY, JSON.stringify(state));
+  } catch (e) {
+    if (!_saveWarned) {
+      _saveWarned = true;
+      console.warn('localStorage unavailable — progress will not persist between reloads:', e);
+      toast('NO SAVE', 'Preview sandbox blocks storage. Open the file directly in your browser to keep progress.');
+    }
+  }
+}
+
+/* ----------------- Date roll ----------------- */
+
+function rollDateIfNeeded() {
+  const t = todayStr();
+  if (state.today === t) return;
+
+  // For each class, check if yesterday had any completion — if yes streak++, else 0.
+  const yesterday = state.today;
+  const yest = state.completions[yesterday] || {};
+  ['fit','content','cyber'].forEach(c => {
+    const got = (yest[c] || []).length > 0;
+    if (got) state.streaks[c] = (state.streaks[c] || 0) + 1;
+    else state.streaks[c] = 0;
+  });
+  // Hero streak: did any class get at least one completion?
+  const anyDone = ['fit','content','cyber','life'].some(c => (yest[c] || []).length > 0);
+  if (anyDone) state.streaks.hero = (state.streaks.hero || 0) + 1; else state.streaks.hero = 0;
+
+  state.today = t;
+  save();
+}
+
+/* ----------------- XP / level math ----------------- */
+
+function levelForXP(xp) { return Math.floor(xp / 100) + 1; }
+function xpForLevel(lvl) { return (lvl - 1) * 100; }
+function multiplierFor(streak) {
+  if (streak >= 30) return 2.0;
+  if (streak >= 14) return 1.5;
+  if (streak >= 7) return 1.25;
+  return 1.0;
+}
+
+function awardXP(category, baseXP) {
+  if (category === 'life') {
+    // Life buffs split XP across the three combat classes
+    const split = Math.ceil(baseXP / 3);
+    ['fit','content','cyber'].forEach(c => addXPRaw(c, split));
+  } else {
+    addXPRaw(category, baseXP);
+  }
+}
+
+function addXPRaw(cat, baseXP) {
+  const mult = multiplierFor(state.streaks[cat] || 0);
+  const gained = Math.round(baseXP * mult);
+  const prevLvl = levelForXP(state.xp[cat]);
+  state.xp[cat] += gained;
+  const newLvl = levelForXP(state.xp[cat]);
+  if (newLvl > prevLvl) {
+    state.levels[cat] = newLvl;
+    toast('LEVEL UP', `${capitalize(cat)} → Lv ${newLvl}`);
+  }
+}
+
+function capitalize(s) { return s[0].toUpperCase() + s.slice(1); }
+
+/* ----------------- Quest handling ----------------- */
+
+function isDone(cat, id) {
+  const c = state.completions[state.today] || {};
+  return (c[cat] || []).includes(id);
+}
+
+function toggleQuest(cat, id) {
+  rollDateIfNeeded();
+  state.completions[state.today] = state.completions[state.today] || {};
+  state.completions[state.today][cat] = state.completions[state.today][cat] || [];
+  const arr = state.completions[state.today][cat];
+  const idx = arr.indexOf(id);
+  const def = (QUESTS[cat] || []).find(q => q.id === id);
+  if (!def) return;
+  if (idx >= 0) {
+    arr.splice(idx, 1);
+    // Reverse XP at base value (no streak mult on undo — simple)
+    if (cat === 'life') {
+      const split = Math.ceil(def.xp / 3);
+      ['fit','content','cyber'].forEach(c => { state.xp[c] = Math.max(0, state.xp[c] - split); state.levels[c] = levelForXP(state.xp[c]); });
+    } else {
+      state.xp[cat] = Math.max(0, state.xp[cat] - def.xp);
+      state.levels[cat] = levelForXP(state.xp[cat]);
+    }
+  } else {
+    arr.push(id);
+    awardXP(cat, def.xp);
+    if (cat === 'fit' && id === 'lift') state.lifetime.lifts++;
+    if (cat === 'content' && id === 'post') state.lifetime.posts++;
+    if (cat === 'cyber' && id === 'study') state.lifetime.studyHours++;
+    if (cat === 'cyber' && id === 'lab') state.lifetime.labs++;
+    toast('+XP', `${def.label} — +${Math.round(def.xp * (cat==='life' ? 1 : multiplierFor(state.streaks[cat]||0)))} XP`);
+  }
+  checkAchievements();
+  save();
+  render();
+}
+
+function endDay() {
+  rollDateIfNeeded();
+  const c = state.completions[state.today] || {};
+  const totalToday = ['fit','content','cyber','life'].reduce((n, cat) => n + (c[cat]||[]).length, 0);
+  if (totalToday === 0) {
+    if (!confirm('No quests completed today. End day anyway? (Streaks will reset.)')) return;
+  }
+  // Advance the date pointer by simulating a day end. Force date roll by setting today to yesterday then re-rolling.
+  // Simpler: just compute streaks for today as if rolling, but keep today's date — we'll mark a flag.
+  // Cleanest: bump today to next day so streaks lock in.
+  const next = new Date(state.today + 'T00:00:00'); next.setDate(next.getDate() + 1);
+  // Apply streaks for today
+  ['fit','content','cyber'].forEach(cat => {
+    const got = (c[cat]||[]).length > 0;
+    if (got) state.streaks[cat] = (state.streaks[cat] || 0) + 1; else state.streaks[cat] = 0;
+  });
+  const anyDone = ['fit','content','cyber','life'].some(x => (c[x]||[]).length > 0);
+  if (anyDone) state.streaks.hero = (state.streaks.hero || 0) + 1; else state.streaks.hero = 0;
+  // Lifetime full-day counter: all 3 combat categories had ≥1
+  const allThree = ['fit','content','cyber'].every(cat => (c[cat]||[]).length > 0);
+  if (allThree) state.lifetime.allCategoryDays = (state.lifetime.allCategoryDays || 0) + 1;
+  // All quests possible done?
+  const allPossible = Object.keys(QUESTS).every(cat => (c[cat]||[]).length === QUESTS[cat].length);
+  if (allPossible) state.lifetime.fullDays = (state.lifetime.fullDays || 0) + 1;
+  // Move the cursor
+  state.today = todayStr(next);
+  toast('DAY LOCKED', 'Streaks updated. Rest, recover, repeat.');
+  checkAchievements();
+  save();
+  render();
+}
+
+function resetToday() {
+  if (!confirm('Clear today\'s checks? XP gained today will be refunded.')) return;
+  const c = state.completions[state.today] || {};
+  // Refund XP at base values
+  Object.entries(c).forEach(([cat, ids]) => {
+    ids.forEach(id => {
+      const def = (QUESTS[cat]||[]).find(q => q.id === id);
+      if (!def) return;
+      if (cat === 'life') {
+        const split = Math.ceil(def.xp / 3);
+        ['fit','content','cyber'].forEach(cc => { state.xp[cc] = Math.max(0, state.xp[cc] - split); state.levels[cc] = levelForXP(state.xp[cc]); });
+      } else {
+        state.xp[cat] = Math.max(0, state.xp[cat] - def.xp);
+        state.levels[cat] = levelForXP(state.xp[cat]);
+      }
+    });
+  });
+  state.completions[state.today] = {};
+  save();
+  render();
+}
+
+/* ----------------- Achievements ----------------- */
+
+function unlock(id) {
+  if (state.achievements[id]) return;
+  state.achievements[id] = { date: state.today };
+  const def = ACHIEVEMENTS.find(a => a.id === id);
+  if (def) toast('🏆 ACHIEVEMENT', `${def.title} — ${def.desc}`);
+}
+
+function checkAchievements() {
+  // First blood: any quest ever
+  const everCompleted = Object.values(state.completions).some(d => Object.values(d).some(arr => arr.length > 0));
+  if (everCompleted) unlock('firstblood');
+  // Iron habit
+  const maxStreak = Math.max(state.streaks.fit||0, state.streaks.content||0, state.streaks.cyber||0);
+  if (maxStreak >= 7) unlock('iron7');
+  if (maxStreak >= 30) unlock('forged30');
+  // Gym rat
+  if (state.lifetime.lifts >= 20) unlock('gym20');
+  // Shipper: posted 7 days in a row?
+  if (consecutivePosts() >= 7) unlock('shipper');
+  // 25 hours sec+ study (1 hour per study quest)
+  if (state.lifetime.studyHours >= 25) unlock('pen50');
+  // 10 labs
+  if (state.lifetime.labs >= 10) unlock('labrat');
+  // Triathlete: 5 days running where all 3 hit
+  if (consecutiveAllThree() >= 5) unlock('triathlete');
+  // Diamond: 100 hero streak
+  if ((state.streaks.hero || 0) >= 100) unlock('diamond100');
+  // Boss slayer
+  if (Object.values(state.bossDefeated).some(x => x)) unlock('bossdrop');
+  // Renaissance day
+  if (Object.keys(QUESTS).every(cat => (state.completions[state.today]?.[cat]||[]).length === QUESTS[cat].length)) unlock('allnight');
+  // Auto-unlock from settings progress
+  const tiktokHit = state.settings.tiktokNow >= state.settings.tiktokGoal;
+  const instagramHit = state.settings.instagramNow >= state.settings.instagramGoal;
+  const youtubeHit = state.settings.youtubeNow >= state.settings.youtubeGoal;
+  if (tiktokHit) { unlock('tiktokstar'); state.bossDefeated.tiktok = true; }
+  if (instagramHit) { unlock('instastar'); state.bossDefeated.instagram = true; }
+  if (youtubeHit) { unlock('youtube1k'); state.bossDefeated.youtube = true; }
+  if (tiktokHit || instagramHit || youtubeHit) unlock('creator1k');
+  if (tiktokHit && instagramHit && youtubeHit) unlock('tripleplat');
+  if (state.bossDefeated.secPlus) unlock('secplus');
+}
+
+function consecutivePosts() {
+  // Walk back from today, counting consecutive days where 'post' was completed
+  let n = 0;
+  let d = new Date(state.today + 'T00:00:00');
+  for (let i = 0; i < 365; i++) {
+    const k = todayStr(d);
+    const arr = state.completions[k]?.content || [];
+    if (arr.includes('post')) n++; else break;
+    d.setDate(d.getDate() - 1);
+  }
+  return n;
+}
+function consecutiveAllThree() {
+  let n = 0;
+  let d = new Date(state.today + 'T00:00:00');
+  for (let i = 0; i < 365; i++) {
+    const k = todayStr(d);
+    const c = state.completions[k] || {};
+    const ok = ['fit','content','cyber'].every(cat => (c[cat]||[]).length > 0);
+    if (ok) n++; else break;
+    d.setDate(d.getDate() - 1);
+  }
+  return n;
+}
+
+/* ----------------- Bosses ----------------- */
+
+function bossList() {
+  const daysToExam = daysBetween(state.today, state.settings.secPlusDate);
+  return [
+    {
+      id: 'secPlus',
+      name: 'Boss: Security+ Exam',
+      tag: 'FINAL BOSS',
+      finalCls: true,
+      hp: Math.max(0, Math.min(100, 100 - (state.lifetime.studyHours / 60) * 100)), // 60 hours = ready
+      hpLabel: `${state.lifetime.studyHours}/60 study hrs`,
+      meta: daysToExam >= 0 ? `<span class="countdown">${daysToExam}d</span> until exam` : `Exam was ${-daysToExam}d ago`,
+      action: { label: state.bossDefeated.secPlus ? 'Defeated ✓' : 'Mark exam passed', fn: () => { state.bossDefeated.secPlus = true; checkAchievements(); save(); render(); } }
+    },
+    {
+      id: 'tiktok',
+      name: '🎵 Boss: TikTok Followers',
+      tag: 'SHORT-FORM',
+      hp: Math.max(0, 100 - (state.settings.tiktokNow / state.settings.tiktokGoal) * 100),
+      hpLabel: `${state.settings.tiktokNow.toLocaleString()} / ${state.settings.tiktokGoal.toLocaleString()}`,
+      meta: `Algorithm favors consistency`,
+    },
+    {
+      id: 'instagram',
+      name: '📷 Boss: Instagram Followers',
+      tag: 'SHORT-FORM',
+      hp: Math.max(0, 100 - (state.settings.instagramNow / state.settings.instagramGoal) * 100),
+      hpLabel: `${state.settings.instagramNow.toLocaleString()} / ${state.settings.instagramGoal.toLocaleString()}`,
+      meta: `Reels + carousels`,
+    },
+    {
+      id: 'youtube',
+      name: '▶️ Boss: YouTube Subscribers',
+      tag: 'LONG-FORM',
+      hp: Math.max(0, 100 - (state.settings.youtubeNow / state.settings.youtubeGoal) * 100),
+      hpLabel: `${state.settings.youtubeNow.toLocaleString()} / ${state.settings.youtubeGoal.toLocaleString()} subs`,
+      meta: `Earn it after short-form traction`,
+    },
+    {
+      id: 'posts',
+      name: '📦 Boss: Ship 100 Posts',
+      tag: 'GRIND BOSS',
+      hp: Math.max(0, 100 - (state.lifetime.posts / state.settings.postsGoal) * 100),
+      hpLabel: `${state.lifetime.posts} / ${state.settings.postsGoal} posts`,
+      meta: `Consistency unlocks the algo`,
+    },
+  ];
+}
+
+/* ----------------- Render ----------------- */
+
+function render() {
+  rollDateIfNeeded();
+  document.getElementById('playerName').value = state.name || 'Mason';
+  document.getElementById('avatar').textContent = (state.name || 'M').trim().split(/\s+/).map(w => w[0]).slice(0,2).join('').toUpperCase() || 'M';
+  document.getElementById('todayLabel').textContent = new Date(state.today+'T00:00:00').toDateString() + '   •   day ' + (state.streaks.hero+1) + ' of your journey';
+
+  // Levels & bars
+  ['fit','content','cyber'].forEach(cat => {
+    const lvl = levelForXP(state.xp[cat]);
+    const cur = state.xp[cat] - xpForLevel(lvl);
+    const need = 100;
+    document.getElementById('lvl'+capitalize(cat)).textContent = lvl;
+    document.getElementById('xp'+capitalize(cat)).textContent = `${cur} / ${need} XP`;
+    document.getElementById('bar'+capitalize(cat)).style.width = (cur/need*100) + '%';
+    document.getElementById('streak'+capitalize(cat)).textContent = state.streaks[cat]||0;
+    document.getElementById('mult'+capitalize(cat)).textContent = 'x' + multiplierFor(state.streaks[cat]||0).toFixed(2);
+  });
+  const total = state.xp.fit + state.xp.content + state.xp.cyber;
+  document.getElementById('totalXP').textContent = total.toLocaleString();
+  document.getElementById('totalLevel').textContent = Math.floor(total/300) + 1;
+  document.getElementById('dayStreak').textContent = state.streaks.hero || 0;
+
+  // Quests
+  renderQuestGroup('fit', 'qFit');
+  renderQuestGroup('content', 'qContent');
+  renderQuestGroup('cyber', 'qCyber');
+  renderQuestGroup('life', 'qLife');
+
+  // Bosses
+  const bWrap = document.getElementById('bosses');
+  bWrap.innerHTML = '';
+  bossList().forEach(b => {
+    const div = document.createElement('div');
+    div.className = 'boss ' + (b.finalCls ? 'final' : 'mini');
+    div.innerHTML = `
+      <div class="row"><div class="name">${b.name}</div><div class="tag">${b.tag}</div></div>
+      <div class="hp"><div style="width:${b.hp}%"></div></div>
+      <div class="meta"><span>${b.hpLabel}</span><span>${b.meta}</span></div>
+      ${b.action ? `<button style="margin-top:8px" onclick="(${b.action.fn.toString()})()">${b.action.label}</button>` : ''}
+    `;
+    bWrap.appendChild(div);
+  });
+
+  // Heatmap (last 14 days)
+  const hm = document.getElementById('heatmap');
+  hm.innerHTML = '';
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(state.today + 'T00:00:00'); d.setDate(d.getDate() - i);
+    const k = todayStr(d);
+    const c = state.completions[k] || {};
+    const count = ['fit','content','cyber','life'].reduce((n, cat) => n + (c[cat]||[]).length, 0);
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    if (count >= 1) cell.classList.add('l1');
+    if (count >= 4) cell.classList.add('l2');
+    if (count >= 8) cell.classList.add('l3');
+    if (count >= 12) cell.classList.add('l4');
+    if (k === state.today) cell.classList.add('today');
+    cell.title = `${k} — ${count} quests`;
+    hm.appendChild(cell);
+  }
+
+  // Weigh-in
+  renderWeighIn();
+
+  // Notes
+  document.getElementById('notes').value = state.notes[state.today] || '';
+
+  // Achievements
+  const ag = document.getElementById('achievements');
+  ag.innerHTML = '';
+  ACHIEVEMENTS.forEach(a => {
+    const div = document.createElement('div');
+    const unlocked = !!state.achievements[a.id];
+    div.className = 'ach' + (unlocked ? ' unlocked' : '');
+    div.innerHTML = `<div class="ico">${a.ico}</div><div><div class="t">${a.title}</div><div class="d">${a.desc}</div></div>`;
+    ag.appendChild(div);
+  });
+  document.getElementById('achCount').textContent = Object.keys(state.achievements).length;
+  document.getElementById('achTotal').textContent = ACHIEVEMENTS.length;
+
+  // Settings inputs
+  document.getElementById('cfgSecPlusDate').value = state.settings.secPlusDate;
+  document.getElementById('cfgTiktokNow').value = state.settings.tiktokNow;
+  document.getElementById('cfgTiktokGoal').value = state.settings.tiktokGoal;
+  document.getElementById('cfgInstagramNow').value = state.settings.instagramNow;
+  document.getElementById('cfgInstagramGoal').value = state.settings.instagramGoal;
+  document.getElementById('cfgYoutubeNow').value = state.settings.youtubeNow;
+  document.getElementById('cfgYoutubeGoal').value = state.settings.youtubeGoal;
+  document.getElementById('cfgPostsNow').value = state.lifetime.posts;
+  document.getElementById('cfgPostsGoal').value = state.settings.postsGoal;
+}
+
+function renderWeighIn() {
+  const w = state.weights[state.today] || {};
+  const amEl = document.getElementById('wAM');
+  const pmEl = document.getElementById('wPM');
+  // Only set value if input is not currently focused (avoid stomping typing)
+  if (document.activeElement !== amEl) amEl.value = (w.am ?? '') === '' ? '' : w.am;
+  if (document.activeElement !== pmEl) pmEl.value = (w.pm ?? '') === '' ? '' : w.pm;
+
+  const d = new Date(state.today + 'T00:00:00');
+  const yest = new Date(d); yest.setDate(yest.getDate() - 1);
+  const yw = state.weights[todayStr(yest)] || {};
+
+  // 7-day rolling avg of AM weights
+  let sum = 0, n = 0;
+  for (let i = 0; i < 7; i++) {
+    const dt = new Date(d); dt.setDate(dt.getDate() - i);
+    const ww = state.weights[todayStr(dt)];
+    if (ww && typeof ww.am === 'number' && isFinite(ww.am)) { sum += ww.am; n++; }
+  }
+  const avg = n > 0 ? (sum / n).toFixed(1) : '—';
+
+  // Delta from yesterday AM
+  let deltaHtml = '<span>—</span>';
+  if (typeof w.am === 'number' && typeof yw.am === 'number') {
+    const diff = w.am - yw.am;
+    const cls = diff > 0.05 ? 'up' : (diff < -0.05 ? 'down' : '');
+    const sign = diff > 0 ? '+' : '';
+    deltaHtml = `<span class="delta ${cls}">${sign}${diff.toFixed(1)} lb</span>`;
+  }
+
+  const yestStr = (typeof yw.am === 'number' || typeof yw.pm === 'number')
+    ? `${typeof yw.am === 'number' ? yw.am.toFixed(1) : '—'} / ${typeof yw.pm === 'number' ? yw.pm.toFixed(1) : '—'}`
+    : '—';
+
+  document.getElementById('weighStats').innerHTML = `
+    <span>Yesterday AM/PM: <strong>${yestStr}</strong></span>
+    <span>Δ AM: ${deltaHtml}</span>
+    <span>7d AM avg: <strong>${avg}</strong></span>
+  `;
+}
+
+function bindWeighInInputs() {
+  const handler = (key, el) => {
+    state.weights[state.today] = state.weights[state.today] || {};
+    const raw = el.value.trim();
+    if (raw === '') {
+      delete state.weights[state.today][key];
+    } else {
+      const v = parseFloat(raw);
+      if (isFinite(v) && v > 0) state.weights[state.today][key] = v;
+    }
+    save();
+    renderWeighIn();
+  };
+  const amEl = document.getElementById('wAM');
+  const pmEl = document.getElementById('wPM');
+  amEl.addEventListener('change', () => handler('am', amEl));
+  pmEl.addEventListener('change', () => handler('pm', pmEl));
+}
+
+function renderQuestGroup(cat, elId) {
+  const el = document.getElementById(elId);
+  el.innerHTML = '';
+  QUESTS[cat].forEach(q => {
+    const done = isDone(cat, q.id);
+    const div = document.createElement('div');
+    div.className = 'quest' + (done ? ' done' : '');
+    div.innerHTML = `
+      <div class="q-check"><svg viewBox="0 0 16 16"><path d="M3 8 L7 12 L13 4" fill="none" stroke="#0b0f17" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="q-label">${q.label}</div>
+      <div class="q-xp">+${q.xp} XP</div>
+    `;
+    div.onclick = () => toggleQuest(cat, q.id);
+    el.appendChild(div);
+  });
+}
+
+/* ----------------- Toast ----------------- */
+let toastTimer = null;
+function toast(title, msg) {
+  document.getElementById('toastTitle').textContent = title;
+  document.getElementById('toastMsg').textContent = msg;
+  const el = document.getElementById('toast');
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+/* ----------------- Settings & data ----------------- */
+
+function saveSettings() {
+  state.settings.secPlusDate = document.getElementById('cfgSecPlusDate').value || state.settings.secPlusDate;
+  state.settings.tiktokNow = +document.getElementById('cfgTiktokNow').value || 0;
+  state.settings.tiktokGoal = +document.getElementById('cfgTiktokGoal').value || 1000;
+  state.settings.instagramNow = +document.getElementById('cfgInstagramNow').value || 0;
+  state.settings.instagramGoal = +document.getElementById('cfgInstagramGoal').value || 1000;
+  state.settings.youtubeNow = +document.getElementById('cfgYoutubeNow').value || 0;
+  state.settings.youtubeGoal = +document.getElementById('cfgYoutubeGoal').value || 1000;
+  state.lifetime.posts = +document.getElementById('cfgPostsNow').value || 0;
+  state.settings.postsGoal = +document.getElementById('cfgPostsGoal').value || 100;
+  state.name = document.getElementById('playerName').value || 'Mason';
+  checkAchievements();
+  save(); render();
+  toast('SAVED', 'Settings stored locally.');
+}
+
+document.getElementById('playerName').addEventListener('change', saveSettings);
+document.getElementById('notes').addEventListener('input', e => {
+  state.notes[state.today] = e.target.value;
+  save();
+});
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `life-quest-${state.today}.json`; a.click();
+  URL.revokeObjectURL(url);
+}
+function importData() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'application/json';
+  inp.onchange = e => {
+    const file = e.target.files[0]; if (!file) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const s = JSON.parse(r.result);
+        if (!confirm('Replace current save with imported data?')) return;
+        state = s; save(); render(); toast('IMPORTED', 'Save restored.');
+      } catch (err) { alert('Bad file: ' + err.message); }
+    };
+    r.readAsText(file);
+  };
+  inp.click();
+}
+function hardReset() {
+  if (!confirm('Wipe ALL progress and start fresh? This cannot be undone.')) return;
+  if (!confirm('Really sure? All XP, streaks, achievements gone.')) return;
+  localStorage.removeItem(STATE_KEY);
+  state = defaultState();
+  save(); render();
+  toast('RESET', 'Fresh start. Go.');
+}
+
+/* ----------------- Init ----------------- */
+bindWeighInInputs();
+render();
+
+// Check streak roll every minute in case the user leaves the tab open across midnight
+setInterval(() => { const before = state.today; rollDateIfNeeded(); if (state.today !== before) render(); }, 60_000);
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+# Secrets — never commit a tunnel token
+.env
+.env.*
+!.env.example
+
+# Local exports of your save data
+life-quest-*.json
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker build leftovers
+*.log
