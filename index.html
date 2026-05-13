@@ -38,7 +38,100 @@
   --fit-glow:     #ff5d7a55;
   --content-glow: #b96bff55;
   --cyber-glow:   #3fd0ff55;
+
+  /* Semi-transparent tint variants used by glass / overlay surfaces.
+     Dark mode = near-black with alpha; light mode flips to near-white. */
+  --tab-bar-bg:   rgba(10, 13, 20, .92);
+  --foot-bar-bg:  rgba(10, 13, 20, .95);
+  --boss-card-bg: linear-gradient(180deg, #1a1226, #0e1624);
+  --input-bg:     #0a121d;
 }
+
+[data-theme="light"] {
+  --bg:        #f5f7fb;
+  --surface:   #ffffff;
+  --surface-2: #eef1f7;
+  --line:      #d4d9e4;
+  --line-soft: #e7eaf2;
+  --text:      #1a1f2e;
+  --muted:     #5b6680;
+  --dim:       #8d96ad;
+  --fit:       #d8335c;
+  --content:   #8d3eda;
+  --cyber:     #0d96c0;
+  --good:      #2d9d56;
+  --warn:      #c98715;
+  --life:      #b88507;
+  --bad:       #d8335c;
+  --accent:    #0d96c0;
+  --fit-glow:     #d8335c33;
+  --content-glow: #8d3eda33;
+  --cyber-glow:   #0d96c033;
+  --tab-bar-bg:   rgba(255, 255, 255, .92);
+  --foot-bar-bg:  rgba(255, 255, 255, .95);
+  --boss-card-bg: linear-gradient(180deg, #f5e9ff, #ffffff);
+  --input-bg:     #ffffff;
+}
+[data-theme="light"] html, [data-theme="light"] body { background: var(--bg); }
+/* Light-mode tweaks for elements that hardcoded near-black backgrounds */
+[data-theme="light"] .wz input[type=text],
+[data-theme="light"] .wz input[type=number],
+[data-theme="light"] .wz input[type=date] { background: var(--input-bg); }
+[data-theme="light"] .wz-icons button,
+[data-theme="light"] .wz-class .ic-custom,
+[data-theme="light"] .wz-class .toggle,
+[data-theme="light"] .wz-quest,
+[data-theme="light"] .wz-recap-stat,
+[data-theme="light"] .lq-pill,
+[data-theme="light"] .wz-addclass-tile .plus,
+[data-theme="light"] .wz-step .n { background: var(--input-bg); }
+[data-theme="light"] .wz-class { background: var(--surface); }
+[data-theme="light"] .wz-quest { background: var(--surface); }
+[data-theme="light"] .wz-quest.on { background: var(--surface-2); }
+[data-theme="light"] .wz-quest:hover { background: var(--surface-2); }
+[data-theme="light"] .wz-addboss-form .kind-toggle,
+[data-theme="light"] .mwiz-addboss-form .kind { background: var(--surface-2); }
+[data-theme="light"] .wz-addclass-form,
+[data-theme="light"] .wz-addboss-form,
+[data-theme="light"] .mwiz-addclass-form,
+[data-theme="light"] .mwiz-addboss-form { background: var(--surface); }
+[data-theme="light"] .wz-step.active { background: var(--surface-2); }
+[data-theme="light"] .wz-boss { background: var(--boss-card-bg); }
+[data-theme="light"] .wz-recap-card { background: linear-gradient(180deg, var(--surface-2), var(--surface)); }
+[data-theme="light"] .lq-btn { background: var(--surface-2); }
+[data-theme="light"] .lq-btn:hover { background: var(--surface); }
+[data-theme="light"] .hub-btn:hover { background: var(--surface-2); }
+[data-theme="light"] .hub-bg-radial { display: none; }
+[data-theme="light"] .wz-scope {
+  background: var(--bg);
+}
+[data-theme="light"] .mhub-tabs { background: var(--tab-bar-bg); }
+[data-theme="light"] .mwiz-foot { background: var(--foot-bar-bg); }
+[data-theme="light"] input::placeholder, [data-theme="light"] textarea::placeholder { color: var(--dim); }
+[data-theme="light"] .hub-avatar, [data-theme="light"] .mhub-top .av,
+[data-theme="light"] .mwiz-av, [data-theme="light"] .mwiz-recap-hero .av { background: var(--surface-2); }
+[data-theme="light"] .hub-mark .dot { box-shadow: 0 0 0 1px var(--cyber); }
+[data-theme="light"] .hub-stat .big { color: var(--text); }
+[data-theme="light"] .hub-heat .c { background: #eaedf3; }
+[data-theme="light"] .hub-heat .c.l1 { background: #c8d0dc; }
+[data-theme="light"] .hub-heat .c.l2 { background: #6f8eb8; }
+[data-theme="light"] .hub-heat .c.l3 { background: #0d96c099; }
+[data-theme="light"] .hub-heat .c.l4 { background: var(--cyber); }
+[data-theme="light"] .mhub-heat .c { background: #eaedf3; }
+[data-theme="light"] .mhub-heat .c.l1 { background: #c8d0dc; }
+[data-theme="light"] .mhub-heat .c.l2 { background: #6f8eb8; }
+[data-theme="light"] .mhub-heat .c.l3 { background: #0d96c099; }
+[data-theme="light"] .mhub-heat .c.l4 { background: var(--cyber); }
+[data-theme="light"] .hub-heat-key .k.l1 { background: #c8d0dc; }
+[data-theme="light"] .hub-heat-key .k.l2 { background: #6f8eb8; }
+[data-theme="light"] .hub-heat-key .k.l3 { background: #0d96c099; }
+[data-theme="light"] .hub-heat-key .k.l4 { background: var(--cyber); }
+[data-theme="light"] .wz-class.on .toggle { color: #fff; }
+[data-theme="light"] .hub-q.on .lbl { color: var(--dim); }
+[data-theme="light"] .toast { box-shadow: 0 0 24px rgba(0,0,0,.08), 0 8px 28px rgba(0,0,0,.12); }
+
+/* Light-mode: meta theme-color so iOS chrome flips too */
+[data-theme="light"] meta[name="theme-color"] { content: "#f5f7fb"; }
 
 * { box-sizing: border-box; }
 html, body {
@@ -1624,6 +1717,7 @@ function defaultState() {
     activeClasses: { fit: true, content: true, cyber: true },   // v3 — which classes equipped
     customClasses: [],          // v3 — [{id,name,icon,color,glow,tagline}]
     customBosses: [],           // v3 — [{id,classId,name,kind,current,goal,date}]
+    theme: 'dark',              // v3 — 'dark' | 'light'
   };
 }
 
@@ -1647,6 +1741,7 @@ function mergeWithDefaults(s) {
     activeClasses: { ...def.activeClasses, ...(s.activeClasses || {}) },
     customClasses: Array.isArray(s.customClasses) ? s.customClasses : [],
     customBosses:  Array.isArray(s.customBosses)  ? s.customBosses  : [],
+    theme:         (s.theme === 'light' || s.theme === 'dark') ? s.theme : def.theme,
   };
 
   // v1/v2 migration: existing users with any logged completion skip onboarding.
@@ -1744,6 +1839,19 @@ async function fetchSignedInEmail() {
 }
 
 let _signedInEmail = null;
+
+function applyTheme() {
+  const t = state.theme === 'light' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  const mc = document.querySelector('meta[name="theme-color"]');
+  if (mc) mc.setAttribute('content', t === 'light' ? '#f5f7fb' : '#0a0d14');
+}
+function setTheme(t) {
+  state.theme = (t === 'light' ? 'light' : 'dark');
+  applyTheme();
+  save();
+  render();
+}
 /* ----------------- Helpers ----------------- */
 
 function todayStr(d=new Date()) {
@@ -1843,20 +1951,44 @@ function toast(title, msg) {
 }
 /* ----------------- Quest handling ----------------- */
 
+/* selectedDate — the date the Today panel is currently showing. Defaults to
+   state.today on init; changing it lets the user edit past days. Not
+   persisted (it's a UI cursor, not user data). */
+let selectedDate = null;
+function getSelectedDate() {
+  if (!selectedDate) selectedDate = state.today;
+  if (selectedDate > state.today) selectedDate = state.today;   // never future
+  return selectedDate;
+}
+function setSelectedDate(d) {
+  if (!d) { selectedDate = state.today; return; }
+  // Clamp: never future, never older than 365 days
+  if (d > state.today) d = state.today;
+  const minD = new Date(state.today + 'T00:00:00');
+  minD.setDate(minD.getDate() - 365);
+  const minStr = todayStr(minD);
+  if (d < minStr) d = minStr;
+  selectedDate = d;
+}
+function isViewingToday() { return getSelectedDate() === state.today; }
+
 function isDone(cat, id) {
-  const c = state.completions[state.today] || {};
+  const c = state.completions[getSelectedDate()] || {};
   return (c[cat] || []).includes(id);
 }
 
 function toggleQuest(cat, id) {
   rollDateIfNeeded();
-  state.completions[state.today] = state.completions[state.today] || {};
-  state.completions[state.today][cat] = state.completions[state.today][cat] || [];
-  const arr = state.completions[state.today][cat];
+  const date = getSelectedDate();
+  const editingToday = (date === state.today);
+  state.completions[date] = state.completions[date] || {};
+  state.completions[date][cat] = state.completions[date][cat] || [];
+  const arr = state.completions[date][cat];
   const idx = arr.indexOf(id);
   const def = (state.quests[cat] || []).find(q => q.id === id);
   if (!def) return;
   if (idx >= 0) {
+    // UNTICK
     arr.splice(idx, 1);
     if (cat === 'life') {
       const targets = activeCombatClasses().map(c => c.id);
@@ -1869,18 +2001,48 @@ function toggleQuest(cat, id) {
       state.levels[cat] = levelForXP(state.xp[cat] || 0);
     }
   } else {
+    // TICK
     arr.push(id);
-    awardXP(cat, def.xp);
+    if (editingToday) {
+      awardXP(cat, def.xp);
+    } else {
+      // Past day — base XP only (the streak multiplier at the time is unknown)
+      if (cat === 'life') {
+        const targets = activeCombatClasses().map(c => c.id);
+        if (targets.length) {
+          const split = Math.ceil(def.xp / targets.length);
+          targets.forEach(cc => addXPRawBase(cc, split));
+        }
+      } else {
+        addXPRawBase(cat, def.xp);
+      }
+    }
+    // Lifetime counters: tick whether or not it's today (so retroactively
+    // ticking a forgotten lift counts toward your total)
     if (cat === 'fit' && id === 'lift') state.lifetime.lifts++;
     if (cat === 'content' && id === 'post') state.lifetime.posts++;
     if (cat === 'cyber' && id === 'study') state.lifetime.studyHours++;
     if (cat === 'cyber' && id === 'lab') state.lifetime.labs++;
-    const mult = cat === 'life' ? 1 : multiplierFor(state.streaks[cat] || 0);
-    toast('+XP', `${def.label} — +${Math.round(def.xp * mult)} XP`);
+    const mult = (cat === 'life' || !editingToday) ? 1 : multiplierFor(state.streaks[cat] || 0);
+    toast(editingToday ? '+XP' : '+XP (PAST)', `${def.label} — +${Math.round(def.xp * mult)} XP`);
   }
   checkAchievements();
   save();
   render();
+}
+
+/* Add XP at base value (no streak multiplier) — used for past-day edits. */
+function addXPRawBase(cat, baseXP) {
+  if (!(cat in state.xp)) state.xp[cat] = 0;
+  if (!(cat in state.levels)) state.levels[cat] = 1;
+  const prevLvl = levelForXP(state.xp[cat]);
+  state.xp[cat] += baseXP;
+  const newLvl = levelForXP(state.xp[cat]);
+  if (newLvl > prevLvl) {
+    state.levels[cat] = newLvl;
+    const def = getClassDef(cat);
+    toast('LEVEL UP', `${def ? def.name : capitalize(cat)} → Lv ${newLvl}`);
+  }
 }
 
 function endDay() {
@@ -1909,8 +2071,10 @@ function endDay() {
 }
 
 function resetToday() {
-  if (!confirm("Clear today's checks? XP gained today will be refunded.")) return;
-  const c = state.completions[state.today] || {};
+  const date = getSelectedDate();
+  const label = date === state.today ? "today's" : `${date}'s`;
+  if (!confirm(`Clear ${label} checks? XP gained for that day will be refunded.`)) return;
+  const c = state.completions[date] || {};
   Object.entries(c).forEach(([cat, ids]) => {
     (ids || []).forEach(id => {
       const def = (state.quests[cat] || []).find(q => q.id === id);
@@ -1927,7 +2091,7 @@ function resetToday() {
       }
     });
   });
-  state.completions[state.today] = {};
+  state.completions[date] = {};
   save();
   render();
 }
@@ -3036,15 +3200,32 @@ function renderDesktopHub() {
 }
 
 function renderHubToday() {
-  const c = state.completions[state.today] || {};
+  const date = getSelectedDate();
+  const viewingToday = isViewingToday();
+  const c = state.completions[date] || {};
   const totalDoneToday = Object.values(c).reduce((n, arr) => n + (arr || []).length, 0);
+
+  // Date selector + back pill
+  const dPretty = new Date(date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  const pastBanner = viewingToday ? '' : `
+    <div style="background:var(--surface-2);border:1px solid var(--warn);border-radius:8px;padding:10px 12px;margin-bottom:14px;display:flex;align-items:center;gap:10px;">
+      <span style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--warn);font-family:'JetBrains Mono',monospace;font-weight:700;">Editing past day · ${dPretty}</span>
+      <span style="font-size:11px;color:var(--dim);">XP adjusts at base value · streaks unchanged</span>
+      <button class="hub-btn" style="margin-left:auto" data-action="back-to-today">← Back to today</button>
+    </div>`;
+  const dateRow = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:1px;">
+      <span>VIEWING</span>
+      <input type="date" id="hubDatePicker" value="${date}" max="${state.today}" style="background:var(--input-bg);border:1px solid var(--line);border-radius:6px;padding:4px 8px;color:var(--text);font:inherit;font-size:11px;font-family:'JetBrains Mono',monospace;" />
+      ${viewingToday ? '<span style="color:var(--good);">● TODAY</span>' : `<button class="hub-btn ghost" data-action="back-to-today" style="padding:4px 10px;font-size:11px;">JUMP TO TODAY</button>`}
+    </div>`;
 
   // Quest groups
   const cats = activeQuestCats();
   const groups = cats.map(cat => {
     const list = state.quests[cat.id] || [];
     const doneCount = (c[cat.id] || []).length;
-    const weighIn = cat.id === 'fit' ? renderHubWeighIn() : '';
+    const weighIn = (cat.id === 'fit' && viewingToday) ? renderHubWeighIn() : '';
     const items = list.map(q => {
       const done = isDone(cat.id, q.id);
       return `
@@ -3079,7 +3260,7 @@ function renderHubToday() {
       </div>`;
   }).join('') || `<div style="color:var(--dim);font-size:12px;padding:6px 0;">No bosses — visit Settings to add some.</div>`;
 
-  // Heatmap
+  // Heatmap — clickable to jump to that day
   const heatCells = [];
   for (let i = 13; i >= 0; i--) {
     const d = new Date(state.today + 'T00:00:00'); d.setDate(d.getDate() - i);
@@ -3092,7 +3273,8 @@ function renderHubToday() {
     if (count >= 8) cls = 'l3';
     if (count >= 12) cls = 'l4';
     if (k === state.today) cls += ' today';
-    heatCells.push(`<div class="c ${cls}" title="${k} — ${count} quests"></div>`);
+    if (k === date) cls += ' today'; // also highlight the currently-viewed day
+    heatCells.push(`<div class="c ${cls}" data-heatjump="${k}" title="${k} — ${count} quests · click to edit" style="cursor:pointer"></div>`);
   }
 
   // Achievements
@@ -3104,11 +3286,13 @@ function renderHubToday() {
   return `
     <div class="hub-grid">
       <div class="hub-col">
-        <div class="hub-h"><h2>Daily Quests</h2><span class="count mono">${totalDoneToday} done today</span></div>
+        <div class="hub-h"><h2>Daily Quests</h2><span class="count mono">${totalDoneToday} done</span></div>
+        ${dateRow}
+        ${pastBanner}
         ${groups}
         <div class="hub-actions">
-          <button class="hub-btn primary" data-action="endDay">End Day · Lock Streak</button>
-          <button class="hub-btn ghost" data-action="resetToday">Reset today</button>
+          <button class="hub-btn primary" data-action="endDay" ${viewingToday ? '' : 'disabled title="End Day only works on today"'}>End Day · Lock Streak</button>
+          <button class="hub-btn ghost" data-action="resetToday">${viewingToday ? 'Reset today' : 'Reset this day'}</button>
         </div>
       </div>
       <div class="hub-col">
@@ -3117,8 +3301,8 @@ function renderHubToday() {
         <div class="hub-h divider"><h2>Last 14 Days</h2><span class="count mono">${state.streaks.hero || 0}d streak</span></div>
         <div class="hub-heat">${heatCells.join('')}</div>
         <div class="hub-heat-key"><span>less</span><span class="k"></span><span class="k l1"></span><span class="k l2"></span><span class="k l3"></span><span class="k l4"></span><span>more</span></div>
-        <div class="hub-h divider"><h2>Today's Notes</h2></div>
-        <div class="hub-notes"><textarea id="hubNotes" placeholder="Wins, ideas, what to film tomorrow…">${escapeHtml(state.notes[state.today] || '')}</textarea></div>
+        <div class="hub-h divider"><h2>${viewingToday ? "Today's Notes" : 'Notes · ' + dPretty}</h2></div>
+        <div class="hub-notes"><textarea id="hubNotes" placeholder="Wins, ideas, what to film tomorrow…">${escapeHtml(state.notes[date] || '')}</textarea></div>
       </div>
       <div class="hub-col">
         <div class="hub-h"><h2>Achievements</h2><span class="count mono">${Object.keys(state.achievements).length} / ${ACHIEVEMENTS.length}</span></div>
@@ -3217,6 +3401,19 @@ function attachDesktopHubHandlers() {
   root.querySelectorAll('[data-nav]').forEach(el => {
     el.addEventListener('click', () => { hubNavTab = el.dataset.nav; render(); });
   });
+  // Date picker (past-day editing)
+  const dp = root.querySelector('#hubDatePicker');
+  if (dp) {
+    dp.addEventListener('change', () => { setSelectedDate(dp.value); render(); });
+  }
+  // Heatmap cells — click to jump to that day in Today view
+  root.querySelectorAll('[data-heatjump]').forEach(el => {
+    el.addEventListener('click', () => {
+      setSelectedDate(el.dataset.heatjump);
+      hubNavTab = 'today';
+      render();
+    });
+  });
   // Quest toggles
   root.querySelectorAll('[data-toggle]').forEach(el => {
     el.addEventListener('click', () => {
@@ -3232,11 +3429,18 @@ function attachDesktopHubHandlers() {
       if (b && b.onAction) b.onAction();
     });
   });
-  // End/reset day
+  // End/reset day, back-to-today
   root.querySelectorAll('[data-action]').forEach(el => {
     el.addEventListener('click', () => {
-      if (el.dataset.action === 'endDay') endDay();
-      if (el.dataset.action === 'resetToday') resetToday();
+      const action = el.dataset.action;
+      if (action === 'endDay') {
+        if (!isViewingToday()) { toast('NOT TODAY', 'Switch to today to end the day.'); return; }
+        endDay();
+      } else if (action === 'resetToday') {
+        resetToday();
+      } else if (action === 'back-to-today') {
+        setSelectedDate(state.today); render();
+      }
     });
   });
   // Player name
@@ -3249,11 +3453,12 @@ function attachDesktopHubHandlers() {
       if (av) av.firstChild.textContent = initialsOf(state.name);
     });
   }
-  // Notes
+  // Notes — keyed to selectedDate so notes for past days are editable too
   const notes = root.querySelector('#hubNotes');
   if (notes) {
     notes.addEventListener('input', e => {
-      state.notes[state.today] = e.target.value;
+      const d = getSelectedDate();
+      state.notes[d] = e.target.value;
       save();
     });
   }
@@ -3359,6 +3564,11 @@ function renderDesktopSettings() {
           <div class="sub">Name + display</div>
           <label class="lbl">Hero name</label>
           <input type="text" id="setName" value="${escapeHtml(state.name)}" />
+          <label class="lbl">Theme</label>
+          <div style="display:flex;gap:6px;background:var(--surface-2);padding:3px;border-radius:8px;border:1px solid var(--line);">
+            <button class="hub-btn ${state.theme !== 'light' ? 'primary' : ''}" data-action="set-theme" data-theme="dark" style="flex:1">🌙 Dark</button>
+            <button class="hub-btn ${state.theme === 'light' ? 'primary' : ''}" data-action="set-theme" data-theme="light" style="flex:1">☀️ Light</button>
+          </div>
         </div>
 
         <div class="hs-card">
@@ -3487,6 +3697,7 @@ function attachDesktopSettingsHandlers() {
 }
 
 function handleSettingsAction(action, el) {
+  if (action === 'set-theme') { setTheme(el.dataset.theme); return; }
   if (action === 'redo-onboarding') {
     if (!confirm('Redo onboarding? Your progress (XP, streaks, completions) is preserved — only your goals, classes, and quest list are reset to whatever you pick.')) return;
     state.onboarded = false;
@@ -3651,6 +3862,10 @@ function renderMobileHub() {
 }
 
 function mhRenderToday() {
+  const date = getSelectedDate();
+  const viewingToday = isViewingToday();
+  const dPretty = new Date(date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+
   // Class chips
   const combat = activeCombatClasses();
   const chipsCols = Math.min(3, Math.max(1, combat.length));
@@ -3667,14 +3882,27 @@ function mhRenderToday() {
       </div>`;
   }).join('') || `<div style="grid-column:1/-1;color:var(--dim);font-size:12px;text-align:center;padding:8px;">No classes equipped.</div>`;
 
-  const c = state.completions[state.today] || {};
+  // Date picker — small row above quests
+  const dateRow = `
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 18px 4px;font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:1px;">
+      <span>VIEWING</span>
+      <input type="date" id="mhDatePicker" value="${date}" max="${state.today}" style="background:var(--input-bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px;color:var(--text);font:inherit;font-size:13px;font-family:'JetBrains Mono',monospace;flex:1;" />
+      ${viewingToday ? '' : `<button class="hub-btn" data-action="back-to-today" style="padding:6px 10px;font-size:11px;">TODAY</button>`}
+    </div>`;
+  const pastBanner = viewingToday ? '' : `
+    <div style="margin:0 18px 4px;background:var(--surface-2);border:1px solid var(--warn);border-radius:8px;padding:8px 12px;display:flex;flex-direction:column;gap:2px;">
+      <span style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--warn);font-family:'JetBrains Mono',monospace;font-weight:700;">Editing ${dPretty}</span>
+      <span style="font-size:11px;color:var(--dim);">XP at base · streaks unchanged</span>
+    </div>`;
+
+  const c = state.completions[date] || {};
   const totalDone = Object.values(c).reduce((n, arr) => n + (arr || []).length, 0);
 
   const cats = activeQuestCats();
   const catsHtml = cats.map(cat => {
     const list = state.quests[cat.id] || [];
     const doneCount = (c[cat.id] || []).length;
-    const weighIn = cat.id === 'fit' ? mhRenderWeighIn() : '';
+    const weighIn = (cat.id === 'fit' && viewingToday) ? mhRenderWeighIn() : '';
     const items = list.map(q => {
       const done = isDone(cat.id, q.id);
       return `
@@ -3694,11 +3922,13 @@ function mhRenderToday() {
 
   return `
     <div class="mhub-classes" style="grid-template-columns:repeat(${chipsCols}, 1fr);">${chips}</div>
-    <div class="mhub-sec"><h2>Today's Quests</h2><span class="count">${totalDone} done</span></div>
+    ${dateRow}
+    ${pastBanner}
+    <div class="mhub-sec"><h2>${viewingToday ? "Today's Quests" : "Quests · " + dPretty}</h2><span class="count">${totalDone} done</span></div>
     ${catsHtml}
     <div class="mhub-cta">
-      <button data-action="endDay">End Day · Lock Streak</button>
-      <button class="ghost" data-action="resetToday">Reset today</button>
+      <button data-action="endDay" ${viewingToday ? '' : 'disabled style="opacity:.4"'}>${viewingToday ? 'End Day · Lock Streak' : 'End Day (today only)'}</button>
+      <button class="ghost" data-action="resetToday">${viewingToday ? 'Reset today' : 'Reset this day'}</button>
     </div>`;
 }
 
@@ -3756,7 +3986,7 @@ function mhRenderStats() {
     if (count >= 8) cls = 'l3';
     if (count >= 12) cls = 'l4';
     if (k === state.today) cls += ' today';
-    cells.push(`<div class="c ${cls}" title="${k} — ${count}"></div>`);
+    cells.push(`<div class="c ${cls}" data-heatjump="${k}" title="${k} — ${count} · tap to edit" style="cursor:pointer"></div>`);
   }
   const unlocked = Object.keys(state.achievements).length;
   return `
@@ -3828,6 +4058,15 @@ function mhRenderProfile() {
     <div class="mhub-list">
       <div class="mhub-row" data-action="goto-quest-editor"><span class="k">Customize quests</span><span class="chev">›</span></div>
       <div class="mhub-row" data-action="reset-quests-defaults"><span class="k">Reset to defaults</span><span class="chev">›</span></div>
+    </div>
+
+    <div class="mhub-sec"><h2>Appearance</h2></div>
+    <div class="mhub-list">
+      <div class="mhub-row" data-action="set-theme" data-theme="${state.theme === 'light' ? 'dark' : 'light'}">
+        <span class="k">${state.theme === 'light' ? '☀️' : '🌙'}  Theme</span>
+        <span class="v">${state.theme === 'light' ? 'Light' : 'Dark'}</span>
+        <span class="chev">›</span>
+      </div>
     </div>
 
     <div class="mhub-sec"><h2>Onboarding</h2></div>
@@ -3906,6 +4145,18 @@ function attachMobileHubHandlers() {
   root.querySelectorAll('[data-mtab]').forEach(el => {
     el.addEventListener('click', () => setMhubTab(el.dataset.mtab));
   });
+  // Past-day picker
+  const mdp = root.querySelector('#mhDatePicker');
+  if (mdp) mdp.addEventListener('change', () => { setSelectedDate(mdp.value); renderMobileHub(); });
+  // Heatmap cells — tap to jump to Today on that day
+  root.querySelectorAll('[data-heatjump]').forEach(el => {
+    el.addEventListener('click', () => {
+      setSelectedDate(el.dataset.heatjump);
+      mhubTab = 'today';
+      mhubSubScreen = null;
+      renderMobileHub();
+    });
+  });
   root.querySelectorAll('[data-toggle]').forEach(el => {
     el.addEventListener('click', () => {
       const [cat, id] = el.dataset.toggle.split('|');
@@ -3976,8 +4227,12 @@ function mhSetWeight(key, raw) {
 }
 
 function handleMobileAction(action, el) {
-  if (action === 'endDay') { endDay(); return; }
+  if (action === 'endDay') {
+    if (!isViewingToday()) { toast('NOT TODAY', 'Switch to today to end the day.'); return; }
+    endDay(); return;
+  }
   if (action === 'resetToday') { resetToday(); return; }
+  if (action === 'back-to-today') { setSelectedDate(state.today); renderMobileHub(); return; }
   if (action === 'goto-quest-editor') { mhubSubScreen = 'quest-editor'; renderMobileHub(); return; }
   if (action === 'goto-class-editor') { mhubSubScreen = 'class-editor'; renderMobileHub(); return; }
   if (action === 'goto-boss-editor')  { mhubSubScreen = 'boss-editor';  renderMobileHub(); return; }
@@ -4029,6 +4284,7 @@ setInterval(() => {
 (async function init() {
   setSyncStatus('syncing');
   state = await loadFromApi();
+  applyTheme();
   _signedInEmail = await fetchSignedInEmail();
   if (!_signedInEmail) setSyncStatus('offline'); else setSyncStatus('synced');
   // Seed wizard with state.name when redoing onboarding
