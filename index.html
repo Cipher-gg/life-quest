@@ -4055,16 +4055,28 @@ function mhRenderProfile() {
         <input type="date" class="numeric" id="mhSecDate" value="${state.settings.secPlusDate}" style="width:140px" />
       </div>
       <div class="mhub-row">
-        <span class="k">TikTok goal</span>
-        <input type="number" min="1" class="numeric" id="mhTikGoal" value="${state.settings.tiktokGoal}" />
+        <span class="k">🎵 TikTok</span>
+        <input type="number" min="0" class="numeric" id="mhTikNow" value="${state.settings.tiktokNow}" placeholder="now" style="width:80px" />
+        <span style="color:var(--dim);margin:0 6px;font-family:'JetBrains Mono',monospace;">/</span>
+        <input type="number" min="1" class="numeric" id="mhTikGoal" value="${state.settings.tiktokGoal}" placeholder="goal" style="width:80px" />
       </div>
       <div class="mhub-row">
-        <span class="k">Instagram goal</span>
-        <input type="number" min="1" class="numeric" id="mhIgGoal" value="${state.settings.instagramGoal}" />
+        <span class="k">📷 Instagram</span>
+        <input type="number" min="0" class="numeric" id="mhIgNow" value="${state.settings.instagramNow}" placeholder="now" style="width:80px" />
+        <span style="color:var(--dim);margin:0 6px;font-family:'JetBrains Mono',monospace;">/</span>
+        <input type="number" min="1" class="numeric" id="mhIgGoal" value="${state.settings.instagramGoal}" placeholder="goal" style="width:80px" />
       </div>
       <div class="mhub-row">
-        <span class="k">YouTube goal</span>
-        <input type="number" min="1" class="numeric" id="mhYtGoal" value="${state.settings.youtubeGoal}" />
+        <span class="k">▶️ YouTube</span>
+        <input type="number" min="0" class="numeric" id="mhYtNow" value="${state.settings.youtubeNow}" placeholder="now" style="width:80px" />
+        <span style="color:var(--dim);margin:0 6px;font-family:'JetBrains Mono',monospace;">/</span>
+        <input type="number" min="1" class="numeric" id="mhYtGoal" value="${state.settings.youtubeGoal}" placeholder="goal" style="width:80px" />
+      </div>
+      <div class="mhub-row">
+        <span class="k">📦 Posts shipped</span>
+        <input type="number" min="0" class="numeric" id="mhPostsNow" value="${state.lifetime.posts || 0}" placeholder="now" style="width:80px" />
+        <span style="color:var(--dim);margin:0 6px;font-family:'JetBrains Mono',monospace;">/</span>
+        <input type="number" min="1" class="numeric" id="mhPostsGoal" value="${state.settings.postsGoal}" placeholder="goal" style="width:80px" />
       </div>
     </div>
 
@@ -4185,13 +4197,18 @@ function attachMobileHubHandlers() {
   const nm = root.querySelector('#mhName');
   if (nm) nm.addEventListener('input', e => { state.name = e.target.value || 'Hero'; save(); });
   // Boss inputs
-  [['mhSecDate', v => state.settings.secPlusDate = v || state.settings.secPlusDate],
-   ['mhTikGoal', v => state.settings.tiktokGoal  = +v || 1000],
-   ['mhIgGoal',  v => state.settings.instagramGoal = +v || 1000],
-   ['mhYtGoal',  v => state.settings.youtubeGoal = +v || 1000]].forEach(([id, apply]) => {
+  [['mhSecDate',  v => state.settings.secPlusDate    = v || state.settings.secPlusDate],
+   ['mhTikNow',   v => state.settings.tiktokNow      = +v || 0],
+   ['mhTikGoal',  v => state.settings.tiktokGoal     = +v || 1000],
+   ['mhIgNow',    v => state.settings.instagramNow   = +v || 0],
+   ['mhIgGoal',   v => state.settings.instagramGoal  = +v || 1000],
+   ['mhYtNow',    v => state.settings.youtubeNow     = +v || 0],
+   ['mhYtGoal',   v => state.settings.youtubeGoal    = +v || 1000],
+   ['mhPostsNow', v => state.lifetime.posts          = +v || 0],
+   ['mhPostsGoal',v => state.settings.postsGoal      = +v || 100]].forEach(([id, apply]) => {
     const el = root.querySelector('#' + id);
     if (!el) return;
-    const handler = () => { apply(el.value); save(); el.classList.add('saved-flash'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('saved-flash'), 600); };
+    const handler = () => { apply(el.value); checkAchievements(); save(); el.classList.add('saved-flash'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('saved-flash'), 600); };
     el.addEventListener('input', handler);
     el.addEventListener('change', handler);
   });
