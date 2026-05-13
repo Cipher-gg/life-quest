@@ -935,6 +935,16 @@ button { font-family: inherit; }
   color: var(--dim); font-family: 'JetBrains Mono', Consolas, monospace; font-size: 11px;
 }
 .hub-email a { color: var(--accent); margin-left: 8px; }
+/* Theme toggle button — lives in the top bar */
+.theme-btn {
+  background: var(--surface-2); border: 1px solid var(--line);
+  color: var(--text); cursor: pointer; line-height: 1;
+  padding: 5px 10px; border-radius: 100px; font: inherit; font-size: 14px;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: border-color .15s ease, background .15s ease;
+}
+.theme-btn:hover { border-color: var(--accent); }
+.mhub-top .theme-btn { padding: 6px 9px; margin-left: 8px; font-size: 15px; }
 
 .hub-head {
   display: grid; grid-template-columns: 1fr auto; gap: 32px;
@@ -3186,6 +3196,7 @@ function renderDesktopHub() {
         <div class="hub-mark"><span class="dot"></span><span>Life Quest</span></div>
         <div class="hub-nav">${navHtml}</div>
         <div class="hub-top-right">
+          <button class="theme-btn" data-action="toggle-theme" title="${state.theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}" aria-label="${state.theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}">${state.theme === 'light' ? '🌙' : '☀️'}</button>
           <span class="hub-sync" data-sync><span data-sync-label>…</span></span>
           <span class="hub-email" id="signedInEmail">${escapeHtml(_signedInEmail || 'local mode')} ${_signedInEmail ? '<a href="/cdn-cgi/access/logout">sign out</a>' : ''}</span>
         </div>
@@ -3429,7 +3440,7 @@ function attachDesktopHubHandlers() {
       if (b && b.onAction) b.onAction();
     });
   });
-  // End/reset day, back-to-today
+  // End/reset day, back-to-today, theme toggle, etc.
   root.querySelectorAll('[data-action]').forEach(el => {
     el.addEventListener('click', () => {
       const action = el.dataset.action;
@@ -3440,6 +3451,9 @@ function attachDesktopHubHandlers() {
         resetToday();
       } else if (action === 'back-to-today') {
         setSelectedDate(state.today); render();
+      } else {
+        // Theme toggle, redo-onboarding, export/import/hardReset, etc.
+        handleSettingsAction(action, el);
       }
     });
   });
@@ -3547,6 +3561,7 @@ function renderDesktopSettings() {
         <div class="hub-mark"><span class="dot"></span><span>Life Quest</span></div>
         <div class="hub-nav">${navHtml}</div>
         <div class="hub-top-right">
+          <button class="theme-btn" data-action="toggle-theme" title="${state.theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}" aria-label="${state.theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}">${state.theme === 'light' ? '🌙' : '☀️'}</button>
           <span class="hub-sync" data-sync><span data-sync-label>…</span></span>
           <span class="hub-email">${escapeHtml(_signedInEmail || 'local mode')} ${_signedInEmail ? '<a href="/cdn-cgi/access/logout">sign out</a>' : ''}</span>
         </div>
@@ -3564,11 +3579,8 @@ function renderDesktopSettings() {
           <div class="sub">Name + display</div>
           <label class="lbl">Hero name</label>
           <input type="text" id="setName" value="${escapeHtml(state.name)}" />
-          <label class="lbl">Theme</label>
-          <div style="display:flex;gap:6px;background:var(--surface-2);padding:3px;border-radius:8px;border:1px solid var(--line);">
-            <button class="hub-btn ${state.theme !== 'light' ? 'primary' : ''}" data-action="set-theme" data-theme="dark" style="flex:1">🌙 Dark</button>
-            <button class="hub-btn ${state.theme === 'light' ? 'primary' : ''}" data-action="set-theme" data-theme="light" style="flex:1">☀️ Light</button>
-          </div>
+          <label class="lbl" style="margin-top:14px">Theme</label>
+          <div class="sub" style="margin-bottom:0">Toggle from the ${state.theme === 'light' ? '🌙' : '☀️'} button in the top bar.</div>
         </div>
 
         <div class="hs-card">
@@ -3698,6 +3710,7 @@ function attachDesktopSettingsHandlers() {
 
 function handleSettingsAction(action, el) {
   if (action === 'set-theme') { setTheme(el.dataset.theme); return; }
+  if (action === 'toggle-theme') { setTheme(state.theme === 'light' ? 'dark' : 'light'); return; }
   if (action === 'redo-onboarding') {
     if (!confirm('Redo onboarding? Your progress (XP, streaks, completions) is preserved — only your goals, classes, and quest list are reset to whatever you pick.')) return;
     state.onboarded = false;
@@ -3842,6 +3855,7 @@ function renderMobileHub() {
           <div class="big">${heroLevel}</div>
           <div class="lbl">Hero LV</div>
         </div>
+        <button class="theme-btn" data-action="toggle-theme" title="${state.theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}" aria-label="${state.theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}">${state.theme === 'light' ? '🌙' : '☀️'}</button>
       </div>
       <div class="mhub-screen">${screen}</div>
       <div class="mhub-tabs">
@@ -4058,15 +4072,6 @@ function mhRenderProfile() {
     <div class="mhub-list">
       <div class="mhub-row" data-action="goto-quest-editor"><span class="k">Customize quests</span><span class="chev">›</span></div>
       <div class="mhub-row" data-action="reset-quests-defaults"><span class="k">Reset to defaults</span><span class="chev">›</span></div>
-    </div>
-
-    <div class="mhub-sec"><h2>Appearance</h2></div>
-    <div class="mhub-list">
-      <div class="mhub-row" data-action="set-theme" data-theme="${state.theme === 'light' ? 'dark' : 'light'}">
-        <span class="k">${state.theme === 'light' ? '☀️' : '🌙'}  Theme</span>
-        <span class="v">${state.theme === 'light' ? 'Light' : 'Dark'}</span>
-        <span class="chev">›</span>
-      </div>
     </div>
 
     <div class="mhub-sec"><h2>Onboarding</h2></div>
