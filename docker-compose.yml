@@ -4,28 +4,40 @@ services:
     image: life-quest:latest
     container_name: life-quest
     restart: unless-stopped
-    ports:
-      # Host port : container port. Change the host port if 8080 is in use.
-      - "8080:80"
+    # No host port mapping — the app is only reachable via the cloudflared
+    # tunnel, which talks to it over the internal Docker network. This means
+    # nothing on your LAN can bypass Cloudflare Access.
+    expose:
+      - "80"
+    depends_on:
+      - api
 
-  # Optional: run cloudflared in the same stack so the tunnel comes up
-  # alongside the app. To enable:
-  #   1. Create a tunnel in the Cloudflare Zero Trust dashboard
-  #      (Networks -> Tunnels -> Create a tunnel -> Cloudflared).
-  #   2. Copy the connector token.
-  #   3. Put it in a `.env` file next to this compose file:
-  #        TUNNEL_TOKEN=eyJh...your-token...
-  #   4. In the Cloudflare dashboard, add a public hostname for the tunnel
-  #      that points to:  http://lifequest:80
-  #      (service name "lifequest" resolves via Docker's internal DNS).
-  #   5. Uncomment the block below and run: docker compose up -d
-  #
-  # cloudflared:
-  #   image: cloudflare/cloudflared:latest
-  #   container_name: life-quest-tunnel
-  #   restart: unless-stopped
-  #   command: tunnel --no-autoupdate run
-  #   environment:
-  #     - TUNNEL_TOKEN=${TUNNEL_TOKEN}
-  #   depends_on:
-  #     - lifequest
+  api:
+    build: ./api
+    image: life-quest-api:latest
+    container_name: life-quest-api
+    restart: unless-stopped
+    expose:
+      - "3000"
+    environment:
+      # Your Cloudflare Zero Trust team domain, e.g. mycompany.cloudflareaccess.com
+      - CF_ACCESS_TEAM_DOMAIN=${CF_ACCESS_TEAM_DOMAIN}
+      # The Application Audience (AUD) tag from the Cloudflare Access dashboard
+      # (Zero Trust -> Access -> Applications -> your app -> Overview).
+      - CF_ACCESS_AUD=${CF_ACCESS_AUD}
+      - DB_PATH=/data/users.db
+    volumes:
+      - lifequest-data:/data
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: life-quest-tunnel
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    depends_on:
+      - lifequest
+
+volumes:
+  lifequest-data:

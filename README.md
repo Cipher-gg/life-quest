@@ -3,202 +3,150 @@
 A self-hosted, gamified daily-goals dashboard. Tracks fitness, content creation,
 and Security+ studying with XP, levels, streaks, achievements, and boss fights.
 
-Single-file vanilla HTML/CSS/JS — no build step, no backend, no database.
-Saves to the browser's `localStorage`.
+**v2** adds multi-user support: each user signs in through Cloudflare Access and
+their progress is stored on the server (SQLite), syncing across all devices.
 
 ---
 
-## Run it locally
+## Architecture
 
-Just open `index.html` in a browser. That's it.
-
-```powershell
-# Windows
-start index.html
+```
+User → Cloudflare Tunnel → CF Access (auth) → nginx → index.html
+                                                    → /api/* → Node API → SQLite (Docker volume)
 ```
 
-```bash
-# macOS / Linux
-xdg-open index.html   # or: open index.html
-```
+- **`lifequest`** — nginx container serving `index.html` and proxying `/api/*`.
+- **`api`** — Node service that verifies the Cloudflare Access JWT on every request
+  and reads/writes per-user state to SQLite.
+- **`cloudflared`** — Cloudflare Tunnel connector. The app has no public ports;
+  all traffic comes in through the tunnel.
+
+Per-user state is keyed by the verified email claim from the JWT.
 
 ---
 
-## Deploy on Proxmox via Docker
+## One-time setup
 
-The deployment is a static nginx container. You can run it from a Proxmox LXC
-or a small VM. The steps assume Docker + Docker Compose are installed.
+### 1. Cloudflare Tunnel
 
-### 1. Get the code onto the host
+Cloudflare Zero Trust dashboard → **Networks → Tunnels → Create tunnel** (cloudflared).
+Copy the connector token from the install screen.
+
+Add a Public Hostname for the tunnel:
+- **Subdomain**: e.g. `quest`
+- **Domain**: your Cloudflare-managed domain
+- **Service**: `HTTP` → `lifequest:80`
+
+### 2. Cloudflare Access application
+
+Zero Trust dashboard → **Access → Applications → Add an application → Self-hosted**.
+
+- **Application domain**: `quest.yourdomain.com` (the same hostname above).
+- **Session duration**: 30 days (your call).
+- **Identity providers**: One-time PIN (email) is on by default. Optionally add
+  Google/GitHub.
+- **Policy**: `Allow` → `Include: Emails: you@..., friend@...`.
+
+From the application's Overview tab, copy the **Application Audience (AUD) Tag**
+— a long hex string. You'll need it in `.env` below.
+
+Optional hardening (recommended):
+- **Bot Fight Mode** on (Security → Bots, free).
+- **Country restriction** on the policy (`Require: Country in [US, ...]`).
+- **WAF rule** to challenge unusual traffic.
+
+### 3. Find your team domain
+
+It looks like `<team>.cloudflareaccess.com`. You can see it in the URL of your
+Zero Trust dashboard. Used by the API to fetch CF's JWT signing keys.
+
+### 4. Set environment variables
+
+Copy `.env.example` to `.env` and fill in:
 
 ```bash
-git clone https://github.com/<your-username>/<your-repo>.git life-quest
-cd life-quest
+cp .env.example .env
+nano .env
 ```
 
-### 2. Build and start
+```
+TUNNEL_TOKEN=eyJh...                        # from step 1
+CF_ACCESS_TEAM_DOMAIN=yourteam.cloudflareaccess.com
+CF_ACCESS_AUD=<long hex string from step 2>
+```
+
+### 5. Bring up the stack
 
 ```bash
 docker compose up -d --build
 ```
 
-The app is now live at `http://<proxmox-host-ip>:8080`.
+That's it. Visit `https://quest.yourdomain.com`, sign in with email OTP, and
+the app loads.
 
-The container restarts automatically (`restart: unless-stopped`). To stop it:
+---
 
-```bash
-docker compose down
-```
-
-### 3. Update after pushing changes
+## Updating after pushing changes
 
 ```bash
 git pull
 docker compose up -d --build
 ```
 
-A no-cache header on `index.html` means reloading the browser will pick up the
-new build immediately — no clearing cache.
+The `no-cache` header on `index.html` means reloads pick up the new frontend
+immediately. The API container restarts when its image rebuilds.
 
 ---
 
-## Set up the Cloudflare Tunnel
+## Adding / removing users
 
-The tunnel gives you a public HTTPS URL pointing at the local container, with
-no port-forwarding on your router.
+There's no signup screen — Cloudflare Access controls who can reach the app.
 
-### A. Create the tunnel in Cloudflare
+1. Zero Trust → Access → Applications → your app → Edit
+2. Policies → add/remove emails from the Allow policy
 
-1. Go to <https://one.dash.cloudflare.com/> -> **Networks** -> **Tunnels**.
-2. Click **Create a tunnel** -> **Cloudflared** -> name it (e.g. `lifequest`).
-3. On the install screen, **copy the connector token** (the long string after
-   `--token` in the install command). You don't need to actually run that
-   command — you'll use the token via Docker.
-4. Go to the **Public Hostname** tab in the tunnel settings and add:
-   - **Subdomain**: e.g. `quest`
-   - **Domain**: your Cloudflare-managed domain
-   - **Service**: `HTTP` -> `lifequest:80`
-     (if running cloudflared in the same compose file as the app — Docker's
-     internal DNS resolves the service name `lifequest`)
-   - If you're running cloudflared outside Docker, use `http://localhost:8080`
-     instead.
-
-### B. Run cloudflared
-
-**Option 1 — alongside the app in Docker Compose (easiest):**
-
-1. Copy `.env.example` to `.env` and paste your token:
-
-   ```bash
-   cp .env.example .env
-   nano .env   # set TUNNEL_TOKEN=eyJ...
-   ```
-
-2. Open `docker-compose.yml` and uncomment the `cloudflared:` block.
-
-3. Bring the stack up:
-
-   ```bash
-   docker compose up -d
-   ```
-
-**Option 2 — as a system service on the Proxmox host/LXC:**
-
-```bash
-# Install cloudflared (Debian/Ubuntu)
-curl -L --output cloudflared.deb \
-  https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
-sudo dpkg -i cloudflared.deb
-
-# Install as a system service using your token
-sudo cloudflared service install eyJ...your-token...
-
-# Verify
-sudo systemctl status cloudflared
-```
-
-In this case, point the tunnel's public hostname at `http://localhost:8080`.
-
-### C. Visit your URL
-
-`https://quest.yourdomain.com` -> your dashboard, available anywhere.
+When a new user logs in for the first time, the API returns an empty state for
+their email and the frontend initializes their personal defaults.
 
 ---
 
-## Initial GitHub push
+## Local development (without Cloudflare)
 
-Run from this directory:
+Two options.
+
+**Option A — open the file directly.** Open `index.html` in a browser. The app
+detects there's no `/api/me` and falls back to "local mode": data stays in
+`localStorage` exactly like v1.
+
+**Option B — run the API with auth disabled.**
 
 ```bash
-git init
-git add .
-git commit -m "Initial commit: Life Quest"
-git branch -M main
-git remote add origin https://github.com/<your-username>/<your-repo>.git
-git push -u origin main
+cd api
+SKIP_AUTH=1 DB_PATH=./users.db npm install && npm start
 ```
 
-The `.gitignore` already excludes `.env` and your exported save files, so the
-tunnel token won't leak.
+Then serve `index.html` next to it (e.g. with `python3 -m http.server` from the
+repo root) and proxy `/api/*` to `localhost:3000`, or just open `index.html`
+and hit the API yourself. `SKIP_AUTH=1` treats every request as `dev@local`.
+
+**Never run with `SKIP_AUTH=1` in production.**
 
 ---
 
 ## Backups
 
-Your save data lives in `localStorage` in the browser you use to view the app.
-Use the **Export JSON** button in the Settings panel to download a snapshot;
-**Import** to restore. Drop these into cloud storage or a Git repo for safety.
-
----
-
-## Caveat: per-browser storage
-
-`localStorage` is scoped to the **origin** (scheme + host + port) **and the
-browser**. Practical consequences:
-
-- Phone and desktop will have **separate save files** (same URL, different
-  browsers).
-- Clearing site data wipes your progress.
-- Switching browsers means starting over.
-
-The in-app Export/Import is the manual workaround. If this becomes annoying,
-add a small backend (a tiny Node/Go service with a JSON file on disk would do
-it) so all clients read/write to the server. See **Future: cross-device sync**
-below.
-
----
-
-## Optional: Alternative deploy without Docker
-
-If you'd rather skip Docker, this whole thing is just one file. From a Proxmox
-LXC:
+Your data lives in the Docker volume `lifequest-data` as a single SQLite file
+(`/data/users.db`). To back up:
 
 ```bash
-sudo apt update && sudo apt install -y nginx
-sudo cp index.html /var/www/html/index.html
-sudo cp nginx.conf /etc/nginx/sites-available/lifequest
-sudo ln -sf /etc/nginx/sites-available/lifequest /etc/nginx/sites-enabled/lifequest
-sudo rm -f /etc/nginx/sites-enabled/default
-sudo nginx -t && sudo systemctl reload nginx
+docker compose exec api sqlite3 /data/users.db ".backup /data/users.db.bak"
+docker compose cp api:/data/users.db.bak ./users.db.$(date +%F).bak
 ```
 
-(You may need to tweak `nginx.conf` — the bundled one is written for the
-Docker `conf.d/default.conf` location.)
+Or just snapshot the whole volume periodically.
 
----
-
-## Future: cross-device sync
-
-If/when you want phone + desktop to share data, the smallest change is:
-
-1. Add a tiny HTTP server next to nginx (Node/Go/Python — anything) that
-   exposes `GET /api/state` and `POST /api/state` reading/writing a JSON file.
-2. In `index.html`, replace `localStorage.getItem/setItem` calls with `fetch()`
-   calls against `/api/state`.
-3. Put basic auth or a Cloudflare Access policy in front so only you can hit
-   the API.
-
-Open an issue or just ask Claude to add this when you're ready.
+Each user can also Export/Import their own state as JSON from the in-app
+Settings panel.
 
 ---
 
@@ -206,10 +154,36 @@ Open an issue or just ask Claude to add this when you're ready.
 
 | File | Purpose |
 | ---- | ------- |
-| `index.html` | The whole app — HTML, CSS, JS in one file |
-| `Dockerfile` | nginx:alpine + the HTML |
-| `nginx.conf` | nginx server block (cache + security headers) |
-| `docker-compose.yml` | Compose stack (app + optional cloudflared) |
-| `.env.example` | Template for `TUNNEL_TOKEN` |
-| `.gitignore` | Keeps `.env` and save exports out of git |
+| `index.html` | Frontend — vanilla HTML/CSS/JS, talks to `/api/state` |
+| `Dockerfile` | nginx:alpine + index.html |
+| `nginx.conf` | nginx config (serves static, proxies `/api/*`) |
+| `api/server.js` | Node API — JWT verification + SQLite |
+| `api/Dockerfile` | node:20-alpine + better-sqlite3 + jose |
+| `api/package.json` | API dependencies |
+| `docker-compose.yml` | Compose stack (lifequest + api + cloudflared) |
+| `.env.example` | Template for tunnel token, team domain, AUD tag |
+| `.gitignore` | Keeps `.env` and `*.db` out of git |
 | `.dockerignore` | Keeps repo metadata out of the image |
+
+---
+
+## Security notes
+
+- The API **verifies the CF Access JWT signature and AUD** on every request.
+  Even if someone reached the origin directly (they can't — the tunnel doesn't
+  expose any ports), they couldn't spoof the identity headers.
+- The `lifequest` container does not publish any host port — it's only
+  reachable through `cloudflared` over the internal Docker network.
+- The API logs only `email + action + payload size`, never the state contents.
+- SQLite WAL mode is on for crash-safety.
+
+---
+
+## Migrating from v1 (localStorage-only)
+
+The first time you sign in to v2 with a browser that has a v1 save, the
+frontend detects the empty server state and pushes your local progress up
+automatically. No action required on your end.
+
+If you want to migrate a user *from a different browser*, use the in-app
+Export JSON from v1, then Import it from v2.

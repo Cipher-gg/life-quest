@@ -1,0 +1,15 @@
+{
+  "name": "life-quest-api",
+  "version": "1.0.0",
+  "description": "Life Quest state API. Verifies Cloudflare Access JWTs and stores per-user state in SQLite.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.3.0",
+    "express": "^4.21.0",
+    "jose": "^5.9.6"
+  }
+}

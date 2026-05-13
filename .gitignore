@@ -17,3 +17,11 @@ desktop.ini
 
 # Docker build leftovers
 *.log
+
+# Node API deps and local SQLite files
+api/node_modules/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+users.db.*.bak

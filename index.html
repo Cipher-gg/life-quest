@@ -202,6 +202,60 @@
   }
   input:focus, textarea:focus { outline: none; border-color: var(--accent); }
   label { font-size: 12px; color: var(--muted); display: block; margin: 8px 0 4px; }
+  /* Brief green flash whenever an input auto-saves */
+  .saved-flash { border-color: var(--good) !important; box-shadow: 0 0 0 2px #4cd97b33; transition: border-color .2s ease, box-shadow .2s ease; }
+
+  /* Account / sync bar (sits between header and dashboard) */
+  .account-bar {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    padding: 4px 8px 12px; font-size: 11px; color: var(--dim);
+  }
+  .account-bar a { color: var(--accent); text-decoration: none; }
+  .account-bar a:hover { text-decoration: underline; }
+  .account-right { display: flex; gap: 10px; align-items: center; }
+  .sync-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 3px 10px; border-radius: 100px;
+    background: #0e1624; border: 1px solid var(--border);
+  }
+  .sync-pill .sync-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--muted); transition: background .2s ease, box-shadow .2s ease;
+  }
+  .sync-pill.synced  .sync-dot { background: var(--good); box-shadow: 0 0 6px var(--good); }
+  .sync-pill.syncing .sync-dot { background: var(--warn); box-shadow: 0 0 6px var(--warn); animation: sync-pulse 1s ease-in-out infinite; }
+  .sync-pill.offline .sync-dot { background: var(--bad);  box-shadow: 0 0 6px var(--bad); }
+  @keyframes sync-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* Quest editor (settings panel) */
+  .qe-group { margin-top: 10px; }
+  .qe-group h4 {
+    margin: 6px 0 6px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--c, var(--muted));
+  }
+  .qe-group.fit { --c: var(--fit); }
+  .qe-group.content { --c: var(--content); }
+  .qe-group.cyber { --c: var(--cyber); }
+  .qe-group.life { --c: var(--life); }
+  .qe-row {
+    display: grid; grid-template-columns: 1fr 70px 36px; gap: 6px;
+    margin-bottom: 6px; align-items: center;
+  }
+  .qe-row input { padding: 6px 8px; font-size: 12px; }
+  .qe-row .qe-del {
+    background: transparent; border: 1px solid var(--border); color: var(--bad);
+    padding: 6px 8px; font-size: 14px; line-height: 1; border-radius: 8px;
+    min-height: 0;
+  }
+  .qe-row .qe-del:hover { background: var(--bad); color: #0b0f17; border-color: var(--bad); }
+  .qe-add {
+    width: 100%; background: transparent; border: 1px dashed var(--border);
+    color: var(--muted); padding: 6px; font-size: 12px; margin-top: 4px;
+  }
+  .qe-add:hover { color: var(--c, var(--accent)); border-color: var(--c, var(--accent)); }
+  @media (max-width: 768px) {
+    .qe-row { grid-template-columns: 1fr 60px 36px; }
+  }
 
   /* Settings */
   .settings-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -257,6 +311,93 @@
   .pill.content { color: var(--content); border-color: var(--content); }
   .pill.cyber { color: var(--cyber); border-color: var(--cyber); }
   .footer { color: var(--dim); font-size: 11px; text-align: center; padding: 24px 0 8px; }
+
+  /* ============================================================
+     Mobile (≤768px) — phones in portrait, small tablets
+     ============================================================ */
+  @media (max-width: 768px) {
+    .wrap { padding: 12px; }
+
+    /* Header collapses to two rows: avatar+name, then stats wrapping below */
+    header.hud {
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 12px;
+    }
+    .hud-right {
+      width: 100%;
+      margin-left: 0;
+      gap: 8px;
+      justify-content: space-between;
+    }
+    .lvl-pill {
+      min-width: 0;
+      flex: 1;
+      padding: 6px 8px;
+    }
+    .lvl-pill .big { font-size: 18px; }
+    .lvl-pill .lbl { font-size: 9px; letter-spacing: 0.5px; }
+    .avatar { width: 44px; height: 44px; font-size: 20px; }
+    .hud .name input { font-size: 18px !important; width: 100% !important; }
+    .hud .sub { font-size: 11px; }
+
+    /* Class cards stack */
+    .classes { grid-template-columns: 1fr; gap: 10px; }
+    .class-card { padding: 12px; }
+    .class-card .lvl { font-size: 22px; }
+    .class-card .meta { font-size: 11px; gap: 8px; flex-wrap: wrap; }
+
+    /* Panels */
+    .panel { padding: 14px; border-radius: 12px; }
+    .panel h2 { font-size: 12px; letter-spacing: 1.5px; }
+
+    /* Quests — bigger tap targets, less horizontal cramping */
+    .quest { padding: 12px 12px; min-height: 48px; }
+    .q-check { width: 26px; height: 26px; }
+    .q-label { font-size: 14px; }
+    .q-xp { font-size: 11px; }
+
+    /* Buttons need to be tap-friendly */
+    button, .btn { padding: 10px 14px; font-size: 14px; min-height: 40px; }
+
+    /* Settings two-column grid collapses to one */
+    .settings-row { grid-template-columns: 1fr; gap: 8px; }
+
+    /* Weigh-in stays two-column but tighter */
+    .weigh-in .wi-row { gap: 8px; }
+    .weigh-in .wi-stats { font-size: 10px; }
+
+    /* Achievements: 2 columns still fits */
+    .ach-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .ach { padding: 8px; }
+    .ach .t { font-size: 11px; }
+    .ach .d { font-size: 10px; }
+
+    /* Heatmap: keep 14 columns but shrink */
+    .heatmap { gap: 2px; }
+
+    /* Toast: full-width at bottom on phones */
+    .toast {
+      left: 12px; right: 12px; bottom: 12px;
+      min-width: 0;
+    }
+
+    /* Boss button row wraps */
+    .row-flex { gap: 6px; }
+  }
+
+  /* ============================================================
+     Very small phones (≤480px) — iPhone SE / mini territory
+     ============================================================ */
+  @media (max-width: 480px) {
+    .lvl-pill .big { font-size: 16px; }
+    .lvl-pill .lbl { font-size: 8px; }
+    .ach-grid { grid-template-columns: 1fr; }
+    .heatmap { grid-template-columns: repeat(7, 1fr); }
+    .quest { padding: 12px 10px; }
+    .q-label { font-size: 13px; }
+  }
 </style>
 </head>
 <body>
@@ -283,6 +424,16 @@
       </div>
     </div>
   </header>
+
+  <div class="account-bar mono">
+    <span id="syncPill" class="sync-pill" title="Save status">
+      <span class="sync-dot"></span><span id="syncLabel">…</span>
+    </span>
+    <span class="account-right">
+      <span id="signedInEmail">—</span>
+      <a id="signOutLink" href="/cdn-cgi/access/logout">sign out</a>
+    </span>
+  </div>
 
   <div class="classes">
     <div class="class-card fit">
@@ -444,15 +595,22 @@
       </div>
 
       <div class="row-flex" style="margin-top:12px">
-        <button onclick="saveSettings()" class="primary">Save settings</button>
         <button onclick="exportData()">Export JSON</button>
         <button onclick="importData()" class="ghost">Import</button>
         <button onclick="hardReset()" class="danger">Hard reset</button>
       </div>
+
+      <div class="sep"></div>
+      <h2>Customize Quests</h2>
+      <div class="panel-sub">Edit, add, or remove daily quests. Changes save instantly.</div>
+      <div id="questEditor"></div>
+      <div class="row-flex" style="margin-top:8px">
+        <button class="ghost" onclick="resetQuestsToDefaults()">Reset quests to defaults</button>
+      </div>
     </div>
   </div>
 
-  <div class="footer mono">Life Quest v1 — runs locally, saves to your browser. Built for the cert grind, the gym, and the content trenches.</div>
+  <div class="footer mono">Life Quest v2 — your progress syncs to the server. Built for the cert grind, the gym, and the content trenches.</div>
 </div>
 
 <div class="toast" id="toast"><div class="t" id="toastTitle">+XP</div><div class="m" id="toastMsg">Nice work.</div></div>
@@ -465,7 +623,9 @@
 
 const STATE_KEY = 'lifeQuest_v1';
 
-const QUESTS = {
+/* Default quest list. Used to seed `state.quests` for new users and to "Reset
+   to defaults" from the settings panel. Edits the user makes live in state. */
+const DEFAULT_QUESTS = {
   fit: [
     { id:'lift',   label:'Lift session (or main training block)',     xp:50 },
     { id:'walk',   label:'1 hour walk',                                xp:30 },
@@ -537,6 +697,7 @@ function defaultState() {
     completions: {}, // { 'YYYY-MM-DD': { fit:[ids], content:[ids], cyber:[ids], life:[ids] } }
     weights: {},     // { 'YYYY-MM-DD': { am: number, pm: number } }
     notes: {},       // { 'YYYY-MM-DD': 'text' }
+    quests: JSON.parse(JSON.stringify(DEFAULT_QUESTS)),
     achievements: {},
     settings: {
       secPlusDate: todayStr(oneMonth),
@@ -549,37 +710,123 @@ function defaultState() {
   };
 }
 
-let state = load();
+/* State starts as a default; the real state is loaded async from the API in
+   init() below. We keep a localStorage cache so the UI works offline. */
+let state = defaultState();
 
-function load() {
+function mergeWithDefaults(s) {
+  const def = defaultState();
+  if (!s || typeof s !== 'object') return def;
+  return { ...def, ...s,
+    xp:           {...def.xp, ...s.xp},
+    levels:       {...def.levels, ...s.levels},
+    streaks:      {...def.streaks, ...s.streaks},
+    lifetime:     {...def.lifetime, ...s.lifetime},
+    settings:     {...def.settings, ...s.settings},
+    bossDefeated: {...def.bossDefeated, ...s.bossDefeated},
+    completions:  s.completions  || {},
+    weights:      s.weights      || {},
+    notes:        s.notes        || {},
+    quests:       (s.quests && Object.keys(s.quests).length) ? s.quests : def.quests,
+    achievements: s.achievements || {},
+  };
+}
+
+function setSyncStatus(status) {
+  const pill = document.getElementById('syncPill');
+  const label = document.getElementById('syncLabel');
+  if (!pill || !label) return;
+  pill.classList.remove('synced', 'syncing', 'offline');
+  pill.classList.add(status);
+  label.textContent = status === 'synced'  ? 'synced'
+                    : status === 'syncing' ? 'syncing…'
+                    : status === 'offline' ? 'offline (local only)'
+                    :                        '…';
+}
+
+/* Read from API. Falls back to the localStorage cache if the network fails. */
+async function loadFromApi() {
+  try {
+    const r = await fetch('/api/state', { credentials: 'same-origin' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const s = await r.json();
+
+    // First-run migration: if the server has nothing for this user but they
+    // have a localStorage save from the pre-API version, push it up so they
+    // don't lose progress when they sign in for the first time.
+    if (!s || Object.keys(s).length === 0) {
+      const cached = readLocalCache();
+      if (cached && Object.keys(cached).length > 0) {
+        console.log('[migrate] seeding server state from localStorage cache');
+        state = mergeWithDefaults(cached);
+        await pushStateNow();
+        return state;
+      }
+      return mergeWithDefaults({}); // fresh user, default state
+    }
+    return mergeWithDefaults(s);
+  } catch (e) {
+    console.warn('[load] API unreachable, using localStorage cache:', e.message);
+    setSyncStatus('offline');
+    const cached = readLocalCache();
+    return mergeWithDefaults(cached);
+  }
+}
+
+function readLocalCache() {
   try {
     const raw = localStorage.getItem(STATE_KEY);
-    if (!raw) return defaultState();
-    const s = JSON.parse(raw);
-    // Migrate any missing keys
-    const def = defaultState();
-    return { ...def, ...s, xp: {...def.xp, ...s.xp}, levels:{...def.levels, ...s.levels},
-      streaks:{...def.streaks, ...s.streaks}, lifetime:{...def.lifetime, ...s.lifetime},
-      settings:{...def.settings, ...s.settings}, bossDefeated:{...def.bossDefeated, ...s.bossDefeated},
-      completions: s.completions || {}, weights: s.weights || {}, notes: s.notes || {}, achievements: s.achievements || {} };
-  } catch(e) {
-    console.warn('Load failed, resetting', e);
-    return defaultState();
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
+function writeLocalCache() {
+  try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch {}
+}
+
+let saveDebounce = null;
+let pendingPush = false;
+
+/* Public save() — called everywhere in the app. Writes the local cache
+   immediately and debounces the API write so rapid typing doesn't hammer
+   the backend. */
+function save() {
+  writeLocalCache();
+  setSyncStatus('syncing');
+  pendingPush = true;
+  clearTimeout(saveDebounce);
+  saveDebounce = setTimeout(pushStateNow, 500);
+}
+
+async function pushStateNow() {
+  if (!pendingPush) return;
+  pendingPush = false;
+  try {
+    const r = await fetch('/api/state', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(state),
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    setSyncStatus('synced');
+  } catch (e) {
+    console.warn('[save] push failed, will retry on next change:', e.message);
+    setSyncStatus('offline');
+    // Re-flag so the next save() call retries. We don't auto-retry here to
+    // avoid a tight loop while offline.
+    pendingPush = true;
   }
 }
 
-let _saveWarned = false;
-function save() {
-  try {
-    localStorage.setItem(STATE_KEY, JSON.stringify(state));
-  } catch (e) {
-    if (!_saveWarned) {
-      _saveWarned = true;
-      console.warn('localStorage unavailable — progress will not persist between reloads:', e);
-      toast('NO SAVE', 'Preview sandbox blocks storage. Open the file directly in your browser to keep progress.');
-    }
+/* Best-effort flush on page hide / unload so an in-flight edit isn't lost. */
+window.addEventListener('beforeunload', () => {
+  if (pendingPush) {
+    try {
+      navigator.sendBeacon('/api/state', new Blob([JSON.stringify(state)], { type: 'application/json' }));
+    } catch {}
   }
-}
+});
 
 /* ----------------- Date roll ----------------- */
 
@@ -651,7 +898,7 @@ function toggleQuest(cat, id) {
   state.completions[state.today][cat] = state.completions[state.today][cat] || [];
   const arr = state.completions[state.today][cat];
   const idx = arr.indexOf(id);
-  const def = (QUESTS[cat] || []).find(q => q.id === id);
+  const def = (state.quests[cat] || []).find(q => q.id === id);
   if (!def) return;
   if (idx >= 0) {
     arr.splice(idx, 1);
@@ -699,7 +946,7 @@ function endDay() {
   const allThree = ['fit','content','cyber'].every(cat => (c[cat]||[]).length > 0);
   if (allThree) state.lifetime.allCategoryDays = (state.lifetime.allCategoryDays || 0) + 1;
   // All quests possible done?
-  const allPossible = Object.keys(QUESTS).every(cat => (c[cat]||[]).length === QUESTS[cat].length);
+  const allPossible = Object.keys(state.quests).every(cat => (c[cat]||[]).length === (state.quests[cat]||[]).length);
   if (allPossible) state.lifetime.fullDays = (state.lifetime.fullDays || 0) + 1;
   // Move the cursor
   state.today = todayStr(next);
@@ -715,7 +962,7 @@ function resetToday() {
   // Refund XP at base values
   Object.entries(c).forEach(([cat, ids]) => {
     ids.forEach(id => {
-      const def = (QUESTS[cat]||[]).find(q => q.id === id);
+      const def = (state.quests[cat]||[]).find(q => q.id === id);
       if (!def) return;
       if (cat === 'life') {
         const split = Math.ceil(def.xp / 3);
@@ -763,7 +1010,7 @@ function checkAchievements() {
   // Boss slayer
   if (Object.values(state.bossDefeated).some(x => x)) unlock('bossdrop');
   // Renaissance day
-  if (Object.keys(QUESTS).every(cat => (state.completions[state.today]?.[cat]||[]).length === QUESTS[cat].length)) unlock('allnight');
+  if (Object.keys(state.quests).every(cat => (state.completions[state.today]?.[cat]||[]).length === (state.quests[cat]||[]).length)) unlock('allnight');
   // Auto-unlock from settings progress
   const tiktokHit = state.settings.tiktokNow >= state.settings.tiktokGoal;
   const instagramHit = state.settings.instagramNow >= state.settings.instagramGoal;
@@ -934,16 +1181,131 @@ function render() {
   document.getElementById('achCount').textContent = Object.keys(state.achievements).length;
   document.getElementById('achTotal').textContent = ACHIEVEMENTS.length;
 
-  // Settings inputs
-  document.getElementById('cfgSecPlusDate').value = state.settings.secPlusDate;
-  document.getElementById('cfgTiktokNow').value = state.settings.tiktokNow;
-  document.getElementById('cfgTiktokGoal').value = state.settings.tiktokGoal;
-  document.getElementById('cfgInstagramNow').value = state.settings.instagramNow;
-  document.getElementById('cfgInstagramGoal').value = state.settings.instagramGoal;
-  document.getElementById('cfgYoutubeNow').value = state.settings.youtubeNow;
-  document.getElementById('cfgYoutubeGoal').value = state.settings.youtubeGoal;
-  document.getElementById('cfgPostsNow').value = state.lifetime.posts;
-  document.getElementById('cfgPostsGoal').value = state.settings.postsGoal;
+  // Quest editor (only re-render if no field inside is focused, to avoid stealing the caret)
+  const qeRoot = document.getElementById('questEditor');
+  if (qeRoot && !qeRoot.contains(document.activeElement)) renderQuestEditor();
+
+  // Settings inputs — only set value if the input isn't focused (avoid clobbering typing).
+  const setIfNotFocused = (id, val) => {
+    const el = document.getElementById(id);
+    if (!el || document.activeElement === el) return;
+    el.value = val;
+  };
+  setIfNotFocused('cfgSecPlusDate',  state.settings.secPlusDate);
+  setIfNotFocused('cfgTiktokNow',    state.settings.tiktokNow);
+  setIfNotFocused('cfgTiktokGoal',   state.settings.tiktokGoal);
+  setIfNotFocused('cfgInstagramNow', state.settings.instagramNow);
+  setIfNotFocused('cfgInstagramGoal',state.settings.instagramGoal);
+  setIfNotFocused('cfgYoutubeNow',   state.settings.youtubeNow);
+  setIfNotFocused('cfgYoutubeGoal',  state.settings.youtubeGoal);
+  setIfNotFocused('cfgPostsNow',     state.lifetime.posts);
+  setIfNotFocused('cfgPostsGoal',    state.settings.postsGoal);
+}
+
+/* ----------------- Quest editor ----------------- */
+
+const QUEST_CAT_LABELS = { fit: '🏋️ Fitness', content: '🎬 Content', cyber: '🛡️ Cyber', life: '⚡ Life' };
+
+function renderQuestEditor() {
+  const root = document.getElementById('questEditor');
+  if (!root) return;
+  root.innerHTML = '';
+  ['fit', 'content', 'cyber', 'life'].forEach(cat => {
+    const group = document.createElement('div');
+    group.className = 'qe-group ' + cat;
+    group.innerHTML = `<h4>${QUEST_CAT_LABELS[cat]}</h4>`;
+    (state.quests[cat] || []).forEach(q => {
+      const row = document.createElement('div');
+      row.className = 'qe-row';
+      row.innerHTML = `
+        <input type="text" data-cat="${cat}" data-id="${q.id}" data-field="label" value="${escapeAttr(q.label)}" placeholder="Quest description" />
+        <input type="number" min="0" data-cat="${cat}" data-id="${q.id}" data-field="xp" value="${q.xp}" />
+        <button class="qe-del" title="Delete quest" data-cat="${cat}" data-id="${q.id}">✕</button>
+      `;
+      group.appendChild(row);
+    });
+    const addBtn = document.createElement('button');
+    addBtn.className = 'qe-add';
+    addBtn.textContent = '+ Add quest';
+    addBtn.onclick = () => addQuest(cat);
+    group.appendChild(addBtn);
+    root.appendChild(group);
+  });
+
+  // Wire input listeners on every field — auto-save on edit.
+  root.querySelectorAll('input[data-cat]').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const cat = inp.dataset.cat, id = inp.dataset.id, field = inp.dataset.field;
+      const q = (state.quests[cat] || []).find(x => x.id === id);
+      if (!q) return;
+      if (field === 'xp') q.xp = Math.max(0, parseInt(inp.value, 10) || 0);
+      else q[field] = inp.value;
+      save();
+      flashSaved(inp);
+      renderQuestPanelOnly();
+    });
+  });
+  root.querySelectorAll('.qe-del').forEach(btn => {
+    btn.addEventListener('click', () => deleteQuest(btn.dataset.cat, btn.dataset.id));
+  });
+}
+
+function addQuest(cat) {
+  state.quests[cat] = state.quests[cat] || [];
+  const id = cat + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+  state.quests[cat].push({ id, label: 'New quest', xp: 10 });
+  save();
+  renderQuestEditor();
+  renderQuestPanelOnly();
+}
+
+function deleteQuest(cat, id) {
+  if (!confirm('Delete this quest? Past completions will be kept but it won\'t appear tomorrow.')) return;
+  state.quests[cat] = (state.quests[cat] || []).filter(q => q.id !== id);
+  save();
+  renderQuestEditor();
+  renderQuestPanelOnly();
+}
+
+function resetQuestsToDefaults() {
+  if (!confirm('Replace all your custom quests with the original defaults?')) return;
+  state.quests = JSON.parse(JSON.stringify(DEFAULT_QUESTS));
+  save();
+  renderQuestEditor();
+  renderQuestPanelOnly();
+}
+
+/* Re-render just the daily-quest panel after a quest edit, without re-rendering
+   the editor itself (which would steal focus from the input being edited). */
+function renderQuestPanelOnly() {
+  renderQuestGroup('fit', 'qFit');
+  renderQuestGroup('content', 'qContent');
+  renderQuestGroup('cyber', 'qCyber');
+  renderQuestGroup('life', 'qLife');
+}
+
+function escapeAttr(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+/* Render just the boss panel — used by settings auto-save so typing in a
+   follower count updates the boss HP bar in real time without re-rendering
+   the entire UI and stealing focus. */
+function renderBossesOnly() {
+  const bWrap = document.getElementById('bosses');
+  if (!bWrap) return;
+  bWrap.innerHTML = '';
+  bossList().forEach(b => {
+    const div = document.createElement('div');
+    div.className = 'boss ' + (b.finalCls ? 'final' : 'mini');
+    div.innerHTML = `
+      <div class="row"><div class="name">${b.name}</div><div class="tag">${b.tag}</div></div>
+      <div class="hp"><div style="width:${b.hp}%"></div></div>
+      <div class="meta"><span>${b.hpLabel}</span><span>${b.meta}</span></div>
+      ${b.action ? `<button style="margin-top:8px" onclick="(${b.action.fn.toString()})()">${b.action.label}</button>` : ''}
+    `;
+    bWrap.appendChild(div);
+  });
 }
 
 function renderWeighIn() {
@@ -1009,7 +1371,7 @@ function bindWeighInInputs() {
 function renderQuestGroup(cat, elId) {
   const el = document.getElementById(elId);
   el.innerHTML = '';
-  QUESTS[cat].forEach(q => {
+  (state.quests[cat] || []).forEach(q => {
     const done = isDone(cat, q.id);
     const div = document.createElement('div');
     div.className = 'quest' + (done ? ' done' : '');
@@ -1036,23 +1398,47 @@ function toast(title, msg) {
 
 /* ----------------- Settings & data ----------------- */
 
-function saveSettings() {
-  state.settings.secPlusDate = document.getElementById('cfgSecPlusDate').value || state.settings.secPlusDate;
-  state.settings.tiktokNow = +document.getElementById('cfgTiktokNow').value || 0;
-  state.settings.tiktokGoal = +document.getElementById('cfgTiktokGoal').value || 1000;
-  state.settings.instagramNow = +document.getElementById('cfgInstagramNow').value || 0;
-  state.settings.instagramGoal = +document.getElementById('cfgInstagramGoal').value || 1000;
-  state.settings.youtubeNow = +document.getElementById('cfgYoutubeNow').value || 0;
-  state.settings.youtubeGoal = +document.getElementById('cfgYoutubeGoal').value || 1000;
-  state.lifetime.posts = +document.getElementById('cfgPostsNow').value || 0;
-  state.settings.postsGoal = +document.getElementById('cfgPostsGoal').value || 100;
-  state.name = document.getElementById('playerName').value || 'Mason';
-  checkAchievements();
-  save(); render();
-  toast('SAVED', 'Settings stored locally.');
+/* Auto-save: each settings input persists its own value on change. No button. */
+
+const SETTINGS_BINDINGS = [
+  ['cfgSecPlusDate', v => state.settings.secPlusDate = v || state.settings.secPlusDate],
+  ['cfgTiktokNow',    v => state.settings.tiktokNow    = +v || 0],
+  ['cfgTiktokGoal',   v => state.settings.tiktokGoal   = +v || 1000],
+  ['cfgInstagramNow', v => state.settings.instagramNow = +v || 0],
+  ['cfgInstagramGoal',v => state.settings.instagramGoal= +v || 1000],
+  ['cfgYoutubeNow',   v => state.settings.youtubeNow   = +v || 0],
+  ['cfgYoutubeGoal',  v => state.settings.youtubeGoal  = +v || 1000],
+  ['cfgPostsNow',     v => state.lifetime.posts        = +v || 0],
+  ['cfgPostsGoal',    v => state.settings.postsGoal    = +v || 100],
+];
+
+function bindSettingsAutoSave() {
+  SETTINGS_BINDINGS.forEach(([id, apply]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const handler = () => {
+      apply(el.value);
+      checkAchievements();
+      save();
+      renderBossesOnly();
+      flashSaved(el);
+    };
+    el.addEventListener('input', handler);
+    el.addEventListener('change', handler);
+  });
 }
 
-document.getElementById('playerName').addEventListener('change', saveSettings);
+function flashSaved(el) {
+  el.classList.add('saved-flash');
+  clearTimeout(el._flashTimer);
+  el._flashTimer = setTimeout(() => el.classList.remove('saved-flash'), 600);
+}
+
+document.getElementById('playerName').addEventListener('input', e => {
+  state.name = e.target.value || 'Mason';
+  save();
+  document.getElementById('avatar').textContent = (state.name || 'M').trim().split(/\s+/).map(w => w[0]).slice(0,2).join('').toUpperCase() || 'M';
+});
 document.getElementById('notes').addEventListener('input', e => {
   state.notes[state.today] = e.target.value;
   save();
@@ -1092,8 +1478,41 @@ function hardReset() {
 }
 
 /* ----------------- Init ----------------- */
-bindWeighInInputs();
-render();
+
+async function fetchSignedInEmail() {
+  try {
+    const r = await fetch('/api/me', { credentials: 'same-origin' });
+    if (!r.ok) return null;
+    const { email } = await r.json();
+    return email || null;
+  } catch { return null; }
+}
+
+(async function init() {
+  setSyncStatus('syncing');
+
+  // Load server state (with localStorage-cache fallback) before first render
+  state = await loadFromApi();
+
+  // Display the signed-in user (or hide the bar entirely if /api/me isn't reachable)
+  const email = await fetchSignedInEmail();
+  const emailEl = document.getElementById('signedInEmail');
+  const linkEl  = document.getElementById('signOutLink');
+  if (email) {
+    emailEl.textContent = email;
+    setSyncStatus('synced');
+  } else {
+    // Not signed in (e.g. running index.html locally with `start index.html`).
+    // Hide the sign-out link since /cdn-cgi/access/logout won't exist.
+    emailEl.textContent = 'local mode';
+    linkEl.style.display = 'none';
+    setSyncStatus('offline');
+  }
+
+  bindWeighInInputs();
+  bindSettingsAutoSave();
+  render();
+})();
 
 // Check streak roll every minute in case the user leaves the tab open across midnight
 setInterval(() => { const before = state.today; rollDateIfNeeded(); if (state.today !== before) render(); }, 60_000);
